@@ -1,325 +1,699 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" data-theme="dark">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>패밀리봇</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>FAMILY</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>document.documentElement.dataset.theme=(window.Telegram?.WebApp?.initData&&Telegram.WebApp.colorScheme||(matchMedia("(prefers-color-scheme:light)").matches?"light":"dark"))==="light"?"light":"dark"</script>
+<link rel="stylesheet" href="/fonts/pretendard.css">
 <style>
-:root {
-  --bg: var(--tg-theme-secondary-bg-color, #f1f2f5);
-  --card: var(--tg-theme-section-bg-color, var(--tg-theme-bg-color, #ffffff));
-  --text: var(--tg-theme-text-color, #14161a);
-  --hint: var(--tg-theme-hint-color, #7d8591);
-  --accent: var(--tg-theme-button-color, #2f7cf6);
-  --on-accent: var(--tg-theme-button-text-color, #ffffff);
-  --line: color-mix(in srgb, var(--hint) 22%, transparent);
-  --soft: color-mix(in srgb, var(--accent) 12%, transparent);
-  --up: #1f9d61;
-  --down: #d9483b;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: var(--tg-theme-secondary-bg-color, #0f1114);
-    --card: var(--tg-theme-section-bg-color, var(--tg-theme-bg-color, #1a1d22));
-    --text: var(--tg-theme-text-color, #f2f4f7);
-    --hint: var(--tg-theme-hint-color, #8b93a0);
-    --up: #3ecf8e;
-    --down: #ff6b5e;
-  }
-}
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body {
-  margin: 0; background: var(--bg); color: var(--text);
-  font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif;
-  padding: 16px 16px calc(84px + env(safe-area-inset-bottom));
-}
-h1 { font-size: 22px; margin: 4px 0 2px; letter-spacing: -.02em; }
-h2 { font-size: 13px; font-weight: 600; color: var(--hint); margin: 22px 4px 8px; }
-.sub { color: var(--hint); font-size: 13px; }
-.card { background: var(--card); border-radius: 16px; padding: 16px; }
-.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.tile { background: var(--card); border-radius: 16px; padding: 14px 16px; }
-.tile .k { font-size: 12.5px; color: var(--hint); }
-.tile .v { font-size: 22px; font-weight: 700; letter-spacing: -.02em; margin-top: 2px; font-variant-numeric: tabular-nums; }
-.tile .v small { font-size: 13px; font-weight: 600; color: var(--hint); margin-left: 3px; }
-.tile.wide { grid-column: 1 / -1; }
-.hero { background: var(--accent); color: var(--on-accent); }
-.hero .k { color: inherit; opacity: .8; }
-.hero .v { font-size: 30px; }
-.hero .v small { color: inherit; opacity: .8; }
-.list { background: var(--card); border-radius: 16px; overflow: hidden; }
-.row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
-.row + .row { border-top: 1px solid var(--line); }
-.row .main { flex: 1; min-width: 0; }
-.row .title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.row .meta { font-size: 12px; color: var(--hint); }
-.row .num { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.row.me { background: var(--soft); }
-.pos { width: 30px; text-align: center; font-weight: 700; color: var(--hint); font-variant-numeric: tabular-nums; }
-.pos.medal { font-size: 20px; }
-.up { color: var(--up); } .down { color: var(--down); }
-.empty { padding: 28px 16px; text-align: center; color: var(--hint); }
-.seg { display: flex; background: var(--card); border-radius: 12px; padding: 4px; gap: 4px; margin-bottom: 12px; }
-.seg button { flex: 1; border: 0; background: none; color: var(--hint); font: inherit; font-weight: 600; padding: 8px 0; border-radius: 9px; }
-.seg button.on { background: var(--accent); color: var(--on-accent); }
-nav {
-  position: fixed; left: 0; right: 0; bottom: 0; display: flex; background: var(--card);
-  border-top: 1px solid var(--line); padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
-}
-nav button { flex: 1; border: 0; background: none; color: var(--hint); font: inherit; font-size: 11.5px; font-weight: 600; padding: 6px 0; border-radius: 12px; }
-nav button i { display: block; font-style: normal; font-size: 21px; line-height: 1.2; filter: grayscale(1); opacity: .65; }
-nav button.on { color: var(--accent); }
-nav button.on i { filter: none; opacity: 1; }
-.chart { position: relative; }
-.chart svg { display: block; width: 100%; height: 150px; overflow: visible; }
-.chart .bar { fill: var(--accent); }
-.chart .bar.dim { opacity: .35; }
-.chart .gridline { stroke: var(--line); stroke-width: 1; }
-.chart text { fill: var(--hint); font-size: 10.5px; font-variant-numeric: tabular-nums; }
-.tip {
-  position: absolute; top: -6px; transform: translate(-50%, -100%); background: var(--text); color: var(--card);
-  font-size: 12px; font-weight: 600; padding: 5px 9px; border-radius: 8px; white-space: nowrap; pointer-events: none; display: none;
-}
-.wheel-wrap { position: relative; width: min(78vw, 320px); aspect-ratio: 1; margin: 8px auto 18px; }
-.wheel { width: 100%; height: 100%; transition: transform 4.2s cubic-bezier(.12, .7, .1, 1); }
-.wheel text { font-size: 15px; font-weight: 700; fill: var(--text); }
-.wheel .a { fill: var(--card); } .wheel .b { fill: var(--soft); }
-.wheel path { stroke: var(--line); stroke-width: 1; }
-.pointer { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border: 12px solid transparent; border-top: 20px solid var(--accent); z-index: 1; }
-.hub { position: absolute; inset: 41%; border-radius: 50%; background: var(--accent); border: 4px solid var(--card); }
-.btn { display: block; width: 100%; border: 0; border-radius: 14px; padding: 15px; background: var(--accent); color: var(--on-accent); font: inherit; font-size: 16px; font-weight: 700; }
-.btn:disabled { opacity: .45; }
-.result { text-align: center; min-height: 54px; margin-top: 14px; }
-.result b { font-size: 24px; letter-spacing: -.02em; }
-.center { text-align: center; }
-#gate { padding: 30vh 24px 0; text-align: center; color: var(--hint); }
-[hidden] { display: none !important; }
+:root,.noir{--bg:#0D0C0A;--surface:#151310;--elev:#1E1B16;--bar:#110F0D;--line:rgba(238,226,198,.09);--line2:rgba(238,226,198,.18);--text:#F3EDE0;--text2:#ABA291;--text3:#8A8272;--gold:#C9A96A;--gold-ink:#D8BD84;--wash:rgba(201,169,106,.1);--edge:rgba(201,169,106,.36);--pos:#93C6A4;--neg:#E3927F;--foil:linear-gradient(180deg,#F5E8C4,#D8BC7E 46%,#B08E4E);--panel:linear-gradient(180deg,rgba(255,240,205,.035),rgba(255,240,205,0) 48%) var(--surface);--sh:inset 0 1px 0 rgba(255,240,205,.05),0 1px 2px rgba(0,0,0,.35);--float:0 20px 40px -20px rgba(0,0,0,.9),0 2px 10px rgba(0,0,0,.5)}
+:root{color-scheme:dark;--p2:#BDB7AA;--p3:#B08257;--glow:rgba(201,169,106,.075);--shim:rgba(255,240,205,.07);--obj:0 30px 50px -28px rgba(0,0,0,.95),0 12px 22px -16px rgba(0,0,0,.7);--metal:linear-gradient(135deg,#F3E5BE,#D3B678 30%,#A7864A 64%,#E2CA92);--on-gold:#17120A;--ease:cubic-bezier(.2,.7,.2,1);--g:20px;--sab:max(env(safe-area-inset-bottom,0px),calc(var(--tg-safe-area-inset-bottom,0px) + var(--tg-content-safe-area-inset-bottom,0px)));--sat:calc(var(--tg-safe-area-inset-top,0px) + var(--tg-content-safe-area-inset-top,0px))}
+:root[data-theme=light]{color-scheme:light;--bg:#F2EDE3;--surface:#FBF8F2;--elev:#FFFFFF;--bar:#FBF8F2;--line:rgba(52,40,18,.1);--line2:rgba(52,40,18,.22);--text:#1B1813;--text2:#655D4F;--text3:#776E61;--gold:#A07C36;--gold-ink:#7E5F1E;--wash:rgba(168,132,62,.1);--edge:rgba(168,132,62,.48);--pos:#2B7A52;--neg:#B5483A;--foil:linear-gradient(180deg,#A07B30,#785A1C);--panel:var(--surface);--sh:inset 0 1px 0 rgba(255,255,255,.9),0 1px 2px rgba(70,52,20,.05),0 12px 24px -20px rgba(70,52,20,.28);--float:0 18px 36px -18px rgba(60,44,14,.38),0 2px 8px rgba(60,44,14,.1);--p2:#8F897D;--p3:#9A6C40;--glow:rgba(255,255,255,.65);--shim:rgba(255,255,255,.75);--obj:0 26px 40px -24px rgba(48,34,8,.62),0 8px 16px -10px rgba(48,34,8,.3)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg);-webkit-text-size-adjust:100%}
+body{min-height:100vh;color:var(--text);font:500 15px/1.45 Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Segoe UI",Roboto,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;-webkit-user-select:none;user-select:none}
+body::before{content:"";position:fixed;inset:0 0 auto;z-index:-1;height:380px;background:radial-gradient(90% 100% at 50% 0,var(--glow),transparent 72%);pointer-events:none}
+button{border:0;background:none;color:inherit;font:inherit;cursor:pointer;touch-action:manipulation}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+b,i,em{font-style:normal;font-weight:inherit}
+[hidden]{display:none!important}
+.defs{position:absolute;width:0;height:0}
+.ic{flex:none;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.foil{padding-right:.04em;background:var(--foil);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+main,#boot{max-width:480px;margin:0 auto;padding:calc(var(--sat) + 14px) var(--g) calc(var(--sab) + 94px)}
+.view{display:none}
+.view.on{display:block}
+.in>*{animation:rise .6s var(--ease) both;animation-delay:calc(var(--i,0)*60ms)}
+.in>:nth-child(2){--i:1}.in>:nth-child(3){--i:2}.in>:nth-child(4){--i:3}.in>:nth-child(5){--i:4}.in>:nth-child(n+6){--i:5}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}}
+@keyframes fade{from{opacity:0}}
+.top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:2px 2px 16px}
+h1{font-size:24px;line-height:1.25;font-weight:700;letter-spacing:-.03em}
+.top p{font-size:13px;color:var(--text2);white-space:nowrap}
+.panel{margin-top:12px;padding:18px;border:1px solid var(--line);border-radius:20px;background:var(--panel);box-shadow:var(--sh)}
+.ph{display:flex;align-items:baseline;justify-content:space-between;gap:12px;min-height:26px}
+h2{font-size:15px;font-weight:600;letter-spacing:-.015em;white-space:nowrap}
+h2 small{margin-left:7px;font-size:12.5px;font-weight:500;letter-spacing:0;color:var(--text3)}
+.ph>span{font-size:12.5px;color:var(--text2);white-space:nowrap}
+.ph>span b{font-weight:600;color:var(--text)}
+
+.card{position:relative;display:flex;flex-direction:column;justify-content:space-between;aspect-ratio:1.6;padding:20px 22px 19px;overflow:hidden;border-radius:22px;color:var(--text);background:radial-gradient(110% 80% at 8% 0,rgba(201,169,106,.17),transparent 58%),linear-gradient(145deg,#27221A,#171511 44%,#0E0D0B);box-shadow:var(--obj)}
+.card::before{content:"";position:absolute;inset:0;padding:1px;border-radius:inherit;background:linear-gradient(150deg,rgba(243,226,178,.8),rgba(201,169,106,.14) 36%,rgba(201,169,106,.06) 64%,rgba(226,202,146,.5));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.card::after{content:"";position:absolute;inset:-20% auto -20% 0;width:44%;background:linear-gradient(100deg,transparent,rgba(255,244,214,.1) 50%,transparent);transform:translateX(-130%) skewX(-14deg);pointer-events:none}
+.in>.card::after{animation:sheen 1.7s .45s var(--ease) both}
+@keyframes sheen{to{transform:translateX(360%) skewX(-14deg)}}
+.guil{position:absolute;top:4%;left:21%;width:130%;aspect-ratio:1;fill:none;stroke:#C9A96A;stroke-width:.4;opacity:.36;-webkit-mask:radial-gradient(closest-side,#000 20%,transparent 96%);mask:radial-gradient(closest-side,#000 20%,transparent 96%);pointer-events:none}
+.card>div{position:relative;display:flex;justify-content:space-between;gap:14px;min-width:0}
+.c-top{align-items:center}
+.mark{display:flex;align-items:center;gap:8px;min-width:0;font-size:13px;font-weight:700;letter-spacing:.3em;white-space:nowrap}
+.mark svg{flex:none;width:9px;height:11px;fill:#D3B678}
+.mark span{overflow:hidden;text-overflow:ellipsis}
+.ava{display:grid;place-items:center;flex:none;width:40px;height:40px;overflow:hidden;border:1.5px solid transparent;border-radius:50%;background:linear-gradient(#1C1914,#1C1914) padding-box,var(--metal) border-box;font-size:15px;font-weight:600;line-height:1;color:#D8BD84}
+.ava img{width:100%;height:100%;object-fit:cover}
+.eng{font-size:9px;font-weight:600;letter-spacing:.24em;color:rgba(243,237,224,.54)}
+.card>.c-mid{flex-direction:column;gap:4px}
+.bal{margin-left:-.04em;padding-bottom:.04em;overflow:hidden;font-size:44px;line-height:1.1;font-weight:600;letter-spacing:-.035em;white-space:nowrap}
+.bal i{margin-left:.2em;font-size:.4em;font-weight:600;letter-spacing:0;color:#D8BD84}
+.c-bot{align-items:flex-end}
+.who{min-width:0}
+.who b,.who span{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.who b{font-size:14.5px;font-weight:600;letter-spacing:.01em;text-shadow:0 1px 0 rgba(0,0,0,.7)}
+.who span{font-size:12px;color:var(--text2)}
+.since{flex:none;text-align:right}
+.since .eng{margin-right:-.24em}
+.since span{display:block;margin-top:3px;font-size:12.5px;letter-spacing:.06em}
+
+.strip{display:grid;grid-auto-columns:minmax(0,1fr);grid-auto-flow:column;padding:0}
+.cell{min-width:0;padding:15px 14px 14px}
+.cell+.cell{border-left:1px solid var(--line)}
+.lab{overflow:hidden;font-size:12px;color:var(--text2);white-space:nowrap;text-overflow:ellipsis}
+.val{margin-top:5px;overflow:hidden;font-size:22px;line-height:1.2;font-weight:600;letter-spacing:-.025em;white-space:nowrap}
+.val i{margin-left:.14em;font-size:.57em;font-weight:500;letter-spacing:0;color:var(--text2)}
+.sub{margin-top:3px;overflow:hidden;font-size:11.5px;color:var(--text3);white-space:nowrap;text-overflow:ellipsis}
+
+.chip{display:inline-flex;align-items:center;align-self:center;gap:4px;height:26px;padding:0 10px 0 7px;border-radius:13px;background:var(--wash);box-shadow:inset 0 0 0 1px var(--edge);font-size:12px;font-weight:600;color:var(--gold-ink)}
+.chip .ic{width:14px;height:14px;stroke-width:2}
+.chip.off{padding:0 10px;background:none;box-shadow:inset 0 0 0 1px var(--line2);color:var(--text2)}
+.streak{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:8px}
+.streak .val{margin:0;font-size:26px}
+.streak span{font-size:12.5px;color:var(--text2);white-space:nowrap}
+.streak span b{font-weight:600;color:var(--text)}
+.ruler{display:flex;align-items:flex-end;height:22px;margin:18px 0 26px}
+.ruler i{position:relative;display:flex;flex:1;align-items:flex-end;justify-content:center;height:100%}
+.ruler i::before{content:"";width:3px;height:3px;border-radius:2px;background:var(--line2)}
+.ruler .n::before{height:8px}
+.ruler .y::before{height:100%;background:linear-gradient(var(--gold-ink),var(--gold))}
+.ruler .t::before{height:100%;background:none;box-shadow:inset 0 0 0 1px var(--text2)}
+.ruler .wk{margin-left:5px}
+.ruler span{position:absolute;top:calc(100% + 9px);left:50%;font-size:10.5px;line-height:1.3;color:var(--text3);transform:translateX(-50%)}
+.ruler .now::after{content:"";position:absolute;top:calc(100% + 3px);width:3px;height:3px;border-radius:50%;background:var(--gold)}
+.ruler .now span{font-weight:600;color:var(--text)}
+.hint{margin-top:16px;padding-top:13px;border-top:1px solid var(--line);font-size:12.5px;color:var(--text2)}
+.hint b{font-weight:600;color:var(--text)}
+
+.chart{position:relative;margin-top:14px;touch-action:pan-y}
+.chart svg{display:block;overflow:visible}
+.gl{stroke:var(--line)}
+.gl.b{stroke:var(--line2)}
+.avl{stroke:var(--text3);opacity:.8}
+.tk{font-size:10.5px;fill:var(--text3)}
+.pk{font-size:10.5px;font-weight:600;fill:var(--text2);stroke:var(--surface);stroke-width:5px;stroke-linejoin:round;paint-order:stroke}
+.nil{font-size:12px;fill:var(--text3)}
+.bars path{fill:url(#gBar);transform-box:fill-box;transform-origin:50% 100%;animation:grow .8s var(--ease) both;animation-delay:calc(var(--d)*16ms)}
+.bars.dn path{fill:var(--text3);transform-origin:50% 0}
+@keyframes grow{from{transform:scaleY(0)}}
+.ln{fill:none;stroke:var(--gold);stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.ar{fill:url(#gArea)}
+.ar,.ln,.end{animation:fade 1s .15s var(--ease) both}
+.dot{fill:var(--gold);stroke:var(--surface);stroke-width:2}
+.xh{stroke:var(--line2)}
+.xh,.xd{opacity:0}
+.scrub .xh,.scrub .xd{opacity:1}
+.scrub .pk,.scrub .end{opacity:0}
+.scrub .bars path{opacity:.34}
+.scrub .bars path.on{opacity:1}
+.tip{position:absolute;top:-10px;left:0;display:flex;align-items:baseline;gap:6px;padding:5px 9px;border-radius:9px;background:var(--elev);box-shadow:inset 0 0 0 1px var(--line2),var(--float);font-size:11.5px;color:var(--text2);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s}
+.tip b{font-size:12.5px;font-weight:600;color:var(--text)}
+.scrub .tip{opacity:1}
+.lg{display:flex;gap:16px;margin-top:10px;font-size:12.5px;color:var(--text2)}
+.lg i{display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:2px;background:var(--gold)}
+.lg span+span i{background:var(--text3)}
+.lg b{margin-left:5px;font-weight:600;color:var(--text)}
+
+.list{padding:16px 18px 6px}
+.grp{padding:14px 0 2px;font-size:12px;font-weight:600;color:var(--text3)}
+.row{display:flex;align-items:center;gap:12px;min-height:58px;padding:9px 0}
+.row+.row{background:linear-gradient(var(--line),var(--line)) 46px 0/100% 1px no-repeat}
+.ico,.av{display:grid;place-items:center;flex:none;width:34px;height:34px;border-radius:50%;background:var(--elev);box-shadow:inset 0 0 0 1px var(--line2);font-size:13.5px;font-weight:600;line-height:1;color:var(--text2)}
+.ico .ic{width:18px;height:18px}
+.rm{flex:1;min-width:0}
+.rm b,.rm span{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.rm b{font-size:14.5px;font-weight:600}
+.rm span{font-size:12px;color:var(--text3)}
+.row em{flex:none;font-size:15px;font-weight:600;letter-spacing:-.01em}
+.pos{color:var(--pos)}
+.neg{color:var(--neg)}
+.gold{color:var(--gold-ink)}
+.empty{display:flex;flex-direction:column;align-items:center;gap:4px;padding:26px 0 30px;color:var(--text3);text-align:center}
+.empty>.ic{width:26px;height:26px;margin-bottom:8px;stroke-width:1.25}
+.empty p{font-size:14px;font-weight:600;color:var(--text2)}
+.empty span{font-size:12.5px}
+.empty .ghost{margin-top:14px}
+.ghost{display:inline-flex;align-items:center;gap:8px;height:46px;padding:0 20px;border-radius:14px;box-shadow:inset 0 0 0 1px var(--edge);font-size:14.5px;font-weight:600;color:var(--gold-ink)}
+.ghost .ic{width:18px;height:18px}
+
+.kpi{grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-flow:row;margin-top:0}
+.kpi .cell{padding:16px 18px 15px}
+.kpi .cell:nth-child(odd){border-left:0}
+.kpi .cell:nth-child(n+3){border-top:1px solid var(--line)}
+.kpi .val{font-size:24px}
+
+.seg{position:relative;display:grid;grid-template-columns:repeat(4,1fr);padding:4px;border:1px solid var(--line);border-radius:15px;background:var(--surface)}
+.seg i{position:absolute;top:4px;bottom:4px;left:4px;width:calc((100% - 8px)/4);border-radius:11px;background:var(--elev);box-shadow:inset 0 0 0 1px var(--edge),0 2px 6px -2px rgba(0,0,0,.4);transform:translateX(calc(var(--k,0)*100%));transition:transform .4s var(--ease)}
+.seg button{position:relative;height:40px;font-size:13.5px;font-weight:600;color:var(--text2)}
+.seg button::after{content:"";position:absolute;inset:-5px 0}
+.seg .on{color:var(--text)}
+.podium{display:grid;grid-template-columns:1fr 1.16fr 1fr;align-items:end;gap:10px;margin-top:22px;padding:0 6px}
+.pod{display:flex;flex-direction:column;align-items:center;min-width:0}
+.pod>.ic{margin-bottom:6px;color:var(--gold-ink)}
+.pod .av{position:relative;width:52px;height:52px;box-shadow:inset 0 0 0 1.5px var(--p2);font-size:19px;color:var(--text)}
+.p3 .av{box-shadow:inset 0 0 0 1.5px var(--p3)}
+.p1 .av{width:68px;height:68px;border:2px solid transparent;background:linear-gradient(var(--elev),var(--elev)) padding-box,var(--metal) border-box;box-shadow:0 12px 24px -12px rgba(201,169,106,.5);font-size:25px}
+.pod .av:empty{border:0;background:none;box-shadow:inset 0 0 0 1px var(--line2)}
+.pod .av:empty+b{color:var(--text3)}
+.podium:last-child{border-bottom:1px solid var(--line2)}
+.pod.me .av::after{content:"나";position:absolute;right:-4px;bottom:-2px;height:18px;padding:0 6px;border-radius:9px;background:var(--metal);box-shadow:0 0 0 2px var(--bg);font-size:10.5px;font-weight:700;line-height:18px;color:var(--on-gold)}
+.pod>b{max-width:100%;margin-top:10px;overflow:hidden;font-size:13.5px;font-weight:600;white-space:nowrap;text-overflow:ellipsis}
+.pod>span:last-of-type{font-size:12.5px;color:var(--text2)}
+.pl{display:grid;place-items:center;width:100%;height:44px;margin-top:12px;border-radius:14px 14px 0 0;background:linear-gradient(var(--elev),var(--surface));box-shadow:inset 0 1px 0 var(--line2),inset 1px 0 0 var(--line),inset -1px 0 0 var(--line);font-size:22px;font-weight:700;color:var(--p3);transform-origin:50% 100%}
+.p2 .pl{height:64px;color:var(--p2)}
+.p1 .pl{height:90px;background:radial-gradient(130% 70% at 50% 0,var(--wash),transparent 72%),linear-gradient(var(--elev),var(--surface));box-shadow:inset 0 1.5px 0 var(--edge),inset 1px 0 0 var(--line),inset -1px 0 0 var(--line);font-size:30px;color:var(--gold-ink)}
+.in .pl{animation:plinth .8s .1s var(--ease) both}
+@keyframes plinth{from{opacity:0;transform:scaleY(.3)}}
+.rows{margin-top:0;padding:6px 18px;border-radius:6px 6px 20px 20px}
+.rows .row{gap:10px;min-height:54px}
+.rows .row+.row{background-position:42px 0}
+.rk{flex:none;min-width:22px;font-size:13.5px;font-weight:600;color:var(--text3);text-align:center}
+.rows .av,.pin .av{width:32px;height:32px;font-size:13px}
+.nm{display:flex;flex:1;align-items:center;gap:6px;min-width:0}
+.nm b{min-width:0;overflow:hidden;font-size:14.5px;white-space:nowrap;text-overflow:ellipsis}
+.tag{flex:none;height:18px;padding:0 6px;border-radius:9px;background:var(--metal);font-size:10.5px;font-weight:700;line-height:18px;color:var(--on-gold)}
+.row.me{margin:0 -18px;padding:9px 18px;background-color:var(--wash);background-image:none;box-shadow:inset 2px 0 0 var(--gold)}
+.row.me b{font-weight:600}
+.row.me em{color:var(--gold-ink)}
+.pin{position:fixed;right:0;bottom:calc(var(--sab) + 59px);left:0;z-index:21;padding:28px var(--g) 12px;background:linear-gradient(transparent,var(--bg) 60%);pointer-events:none}
+.pin .row.me{max-width:440px;margin:0 auto;padding:0 18px;border-radius:18px;background:var(--elev);box-shadow:inset 0 0 0 1px var(--edge),var(--float)}
+.pinned{padding-bottom:76px}
+
+.wheel-box{position:relative;width:max(220px,min(100%,340px,calc(var(--tg-viewport-stable-height,100vh) - 300px)));aspect-ratio:1;margin:2px auto 0}
+.wheel-box::before{content:"";position:absolute;inset:-4%;border-radius:50%;background:radial-gradient(closest-side,rgba(201,169,106,.16) 82%,transparent)}
+[data-theme=light] .wheel-box::before{inset:8% 2% -6%;background:radial-gradient(closest-side,rgba(48,34,8,.34),transparent)}
+.wheel{position:absolute;inset:0;overflow:hidden}
+.wheel>*{position:absolute;inset:0;width:100%;height:100%}
+.bezel{border-radius:50%;background:conic-gradient(from -50deg,#F6EAC8,#CDAE6E 9%,#8C6E3A 22%,#E6D19C 36%,#B4935A 48%,#7C6032 60%,#EBDAAC 74%,#A68646 88%,#F6EAC8);-webkit-mask:radial-gradient(closest-side,transparent 93.8%,#000 94.2%);mask:radial-gradient(closest-side,transparent 93.8%,#000 94.2%)}
+.w0{fill:#221C14}.w1{fill:#14110E}.w2{fill:#2C2419}
+.w-top{fill:url(#gTop)}.w-tint{fill:url(#gTint)}
+.w-sep{stroke:#8F7240;stroke-width:.8;opacity:.75}
+.w-ring{fill:none;stroke:#8F7240}
+.w-peg{fill:#DCC48E;stroke:#17120A;stroke-width:.6}
+.w-lab{font-weight:600;letter-spacing:-.01em;fill:#F0E9D9}
+.t-nil{font-weight:500;fill:#958D7D}
+.t-top{font-weight:700;fill:#1A1408}
+.t-tint{fill:#EAD9AA}
+.hit{fill:rgba(246,234,200,.14);stroke:#F6EAC8;stroke-width:1.5;stroke-linejoin:round;opacity:0}
+.hit.on{animation:hit 1.5s ease-out both}
+@keyframes hit{0%{opacity:0}18%{opacity:1}36%{opacity:.3}58%{opacity:1}to{opacity:.85}}
+.ro{display:flex;flex-direction:column;align-items:center;min-height:84px;margin-top:16px;text-align:center}
+.ro-l{font-size:12px;font-weight:600;letter-spacing:.04em;color:var(--text2)}
+.ro-v{max-width:100%;overflow:hidden;font-size:32px;line-height:1.2;font-weight:600;letter-spacing:-.03em;white-space:nowrap}
+.ro-v i{margin-left:.14em;font-size:.5em;font-weight:600;letter-spacing:0;color:var(--text2)}
+.ro-v .foil+i{color:var(--gold-ink)}
+.ro-s{margin-top:1px;font-size:12.5px;color:var(--text2)}
+.ro.in .ro-v{animation:pop .7s var(--ease) both}
+@keyframes pop{from{opacity:0;transform:scale(.86)}}
+.ro[data-s=lose] .ro-v{color:var(--text2)}
+.ro[data-s=top] .ro-l{display:flex;align-items:center;gap:12px;letter-spacing:.2em;text-indent:.2em;color:var(--gold-ink)}
+.ro[data-s=top] .ro-l::before,.ro[data-s=top] .ro-l::after{content:"";width:28px;height:1px;background:var(--edge)}
+.ro[data-s=top] .ro-v{font-size:38px}
+.cta{display:block;width:100%;height:56px;margin-top:12px;border-radius:16px;background:linear-gradient(#F2E3BA,#D5B97E 52%,#BE9D60);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(0,0,0,.2),0 14px 26px -14px rgba(201,169,106,.55);font-size:16px;font-weight:700;letter-spacing:-.01em;color:var(--on-gold);transition:transform .15s}
+.cta:active{transform:scale(.985)}
+.cta:disabled{background:var(--surface);box-shadow:inset 0 0 0 1px var(--line);color:var(--text3)}
+.cta.busy{box-shadow:inset 0 0 0 1px var(--edge);color:var(--gold-ink)}
+#w-recent{margin-top:22px}
+
+#tabs{position:fixed;right:0;bottom:0;left:0;z-index:20;display:flex;padding:0 8px var(--sab);border-top:1px solid var(--line);background:var(--bar)}
+#tabs::before{content:"";position:absolute;right:0;bottom:calc(100% + 1px);left:0;height:26px;background:linear-gradient(transparent,var(--bg));pointer-events:none}
+#tabs button{display:flex;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:5px;height:58px;font-size:10.5px;font-weight:600;line-height:1;color:var(--text3)}
+#tabs .ic{width:22px;height:22px}
+#tabs .on{color:var(--text)}
+#tabs .on .ic{color:var(--gold-ink)}
+.ind{position:absolute;top:-1px;left:8px;width:calc((100% - 16px)/var(--n,4));height:2px;transform:translateX(calc(var(--k,0)*100%));transition:transform .45s var(--ease)}
+.ind::before{content:"";display:block;width:24px;height:2px;margin:auto;border-radius:0 0 2px 2px;background:linear-gradient(90deg,var(--gold-ink),var(--gold))}
+
+.gate{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px 36px calc(var(--sab) + 14vh);text-align:center}
+.g-em{position:relative;display:grid;place-items:center;width:72px;height:72px;margin-bottom:34px;border-radius:50%;background:var(--surface);box-shadow:inset 0 0 0 1px var(--edge),var(--float);color:var(--gold-ink)}
+.g-em::before,.g-em::after{content:"";position:absolute;inset:-12px;border-radius:50%;box-shadow:inset 0 0 0 1px var(--line2)}
+.g-em::after{inset:-26px;box-shadow:inset 0 0 0 1px var(--line)}
+.g-em .ic{width:28px;height:28px}
+.gate h1{font-size:20px}
+.gate p{max-width:280px;margin-top:8px;font-size:14px;line-height:1.6;color:var(--text2);word-break:keep-all}
+.gate .ghost{margin-top:26px}
+.sk{position:relative;margin-top:12px;overflow:hidden;border:1px solid var(--line);border-radius:20px;background:var(--surface)}
+.sk::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,var(--shim) 50%,transparent 70%);transform:translateX(-100%);animation:shim 1.5s infinite}
+@keyframes shim{to{transform:translateX(100%)}}
+.bn{display:block;border-radius:7px;background:var(--line2)}
+.sk-c{display:flex;flex-direction:column;justify-content:space-between;aspect-ratio:1.6;margin:0;padding:24px 22px;border-radius:22px}
+.sk-s{display:flex;gap:30px;padding:18px 16px}
+.sk-s .bn{flex:1;height:54px}
+#fx{position:fixed;inset:0;z-index:40;overflow:hidden;pointer-events:none}
+#fx i{position:absolute;width:7px;height:10px;margin:-5px;background:#EAD9AA;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+#fx i:nth-child(2n){background:#C9A96A}
+#fx i:nth-child(3n){width:4px;height:4px;border-radius:50%;background:#F6EAC8;clip-path:none}
+#fx b{position:absolute;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--gold)}
+@media(max-width:350px){:root{--g:16px}.panel{padding:16px}.card,.sk-c{aspect-ratio:1.5;padding:18px 18px 17px}.bal{font-size:36px}.strip{padding:0}.cell{padding:14px 12px 13px}.kpi .cell{padding:14px 14px 13px}.val{font-size:20px}.list{padding:14px 16px 4px}.rows{padding:6px 16px}.row.me{margin:0 -16px;padding:9px 16px}.cta{height:52px}.ro{min-height:78px;margin-top:12px}.ro-v{font-size:28px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
-<div id="gate">불러오는 중…</div>
+<svg class="defs" aria-hidden="true"><defs>
+<linearGradient id="gArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--gold);stop-opacity:.26"/><stop offset="1" style="stop-color:var(--gold);stop-opacity:0"/></linearGradient>
+<linearGradient id="gBar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--gold-ink)"/><stop offset="1" style="stop-color:var(--gold);stop-opacity:.5"/></linearGradient>
+<linearGradient id="gGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F6EAC8"/><stop offset=".32" stop-color="#D3B678"/><stop offset=".64" stop-color="#9F7E42"/><stop offset="1" stop-color="#E4CC95"/></linearGradient>
+<radialGradient id="gTop" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="137"><stop offset=".24" stop-color="#96732F"/><stop offset=".64" stop-color="#D4B169"/><stop offset="1" stop-color="#F4E3B3"/></radialGradient>
+<radialGradient id="gTint" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="137"><stop offset=".2" stop-color="#231B0F"/><stop offset="1" stop-color="#40321A"/></radialGradient>
+<radialGradient id="gSheen" cx=".32" cy=".16" r=".86"><stop offset="0" stop-color="#F6DFAE" stop-opacity=".13"/><stop offset=".5" stop-color="#F6DFAE" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".22"/></radialGradient>
+<radialGradient id="gHub" cx=".4" cy=".3" r=".8"><stop offset="0" stop-color="#2E281F"/><stop offset="1" stop-color="#0C0B09"/></radialGradient>
+</defs></svg>
+<div id="boot" aria-busy="true"><div class="top"><i class="bn" style="width:84px;height:28px"></i><i class="bn" style="width:104px;height:14px"></i></div><div class="sk sk-c"><i class="bn" style="width:92px;height:12px"></i><i class="bn" style="width:56%;height:40px"></i><i class="bn" style="width:34%;height:14px"></i></div><div class="sk sk-s"><i class="bn"></i><i class="bn"></i><i class="bn"></i></div><div class="sk" style="height:178px"></div><div class="sk" style="height:190px"></div></div>
+<div id="gate" class="gate" hidden></div>
 <main id="app" hidden>
-  <section data-tab="home">
-    <div class="sub">내 정보</div>
-    <h1 id="name"></h1>
-    <div class="grid" style="margin-top:14px">
-      <div class="tile wide hero"><div class="k">💰 보유 포인트</div><div class="v"><span id="points"></span><small>P</small></div></div>
-      <div class="tile" id="ticketTile"><div class="k">🎟 룰렛 이용권</div><div class="v"><span id="tickets"></span><small>장</small></div></div>
-      <div class="tile"><div class="k">🏆 <span id="periodLabel"></span> 순위</div><div class="v" id="rank"></div></div>
-      <div class="tile"><div class="k">💬 누적 채팅</div><div class="v"><span id="messages"></span><small>회</small></div></div>
-      <div class="tile"><div class="k">📆 출석</div><div class="v"><span id="attend"></span><small id="streak"></small></div></div>
-    </div>
-    <h2>최근 내역</h2>
-    <div class="list" id="logs"></div>
-  </section>
-
-  <section data-tab="stats" hidden>
-    <div class="sub">그룹방</div>
-    <h1>통계</h1>
-    <div class="grid" style="margin-top:14px" id="kpis"></div>
-    <h2>일별 채팅 · 최근 30일</h2>
-    <div class="card"><div class="chart" id="chartDaily"></div></div>
-    <h2>일별 활동 인원 · 최근 30일</h2>
-    <div class="card"><div class="chart" id="chartUsers"></div></div>
-    <h2>시간대별 채팅 · 최근 30일 합계</h2>
-    <div class="card"><div class="chart" id="chartHours"></div></div>
-  </section>
-
-  <section data-tab="rank" hidden>
-    <div class="sub">채팅 횟수</div>
-    <h1>랭킹</h1>
-    <div class="seg" id="periods" style="margin-top:14px"></div>
-    <div class="list" id="ranking"></div>
-  </section>
-
-  <section data-tab="roulette" hidden>
-    <div class="sub">이용권 1장 = 1회</div>
-    <h1>룰렛</h1>
-    <div class="card" style="margin-top:14px">
-      <div class="wheel-wrap"><div class="pointer"></div><svg class="wheel" id="wheel" viewBox="-100 -100 200 200"></svg><div class="hub"></div></div>
-      <button class="btn" id="spin"></button>
-      <div class="result" id="result"></div>
-    </div>
-  </section>
+<section class="view" id="v-home">
+<header class="top"><h1>내 정보</h1><p id="h-date"></p></header>
+<div class="card noir">
+<svg class="guil" id="guil" viewBox="-100 -100 200 200" aria-hidden="true"></svg>
+<div class="c-top"><p class="mark"><svg viewBox="0 0 9 11"><path d="M4.5 0 9 5.5 4.5 11 0 5.5Z"/></svg><span class="foil" id="c-brand"></span></p><span class="ava" id="c-ava"></span></div>
+<div class="c-mid"><p class="eng">POINTS</p><p class="bal"><b class="foil" id="c-pts">0</b><i>P</i></p></div>
+<div class="c-bot"><div class="who"><b id="c-name"></b><span id="c-user"></span></div><div class="since"><p class="eng">MEMBER SINCE</p><span id="c-since"></span></div></div>
+</div>
+<div class="panel strip" id="h-strip"></div>
+<div class="panel" id="h-att"></div>
+<div class="panel" id="h-act"></div>
+<div class="panel list" id="h-logs"></div>
+</section>
+<section class="view" id="v-stats"><header class="top"><h1>통계</h1><p>최근 30일</p></header><div id="s-body"></div></section>
+<section class="view" id="v-rank"><header class="top"><h1>랭킹</h1><p id="r-total"></p></header>
+<div class="seg" id="r-seg"><i></i><button data-period="day">일간</button><button data-period="week">주간</button><button data-period="month">월간</button><button data-period="all">전체</button></div>
+<div id="r-body"></div><div class="pin" id="r-pin" hidden></div></section>
 </main>
-<nav id="nav" hidden></nav>
-
+<nav id="tabs" aria-label="메뉴" hidden></nav>
+<div id="fx" aria-hidden="true"></div>
 <script>
-const tg = window.Telegram?.WebApp;
-const $ = (id) => document.getElementById(id);
-const fmt = (n) => Number(n).toLocaleString("ko-KR");
-const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const PERIODS = { day: "일간", week: "주간", month: "월간", all: "전체" };
-const REASONS = { grant: "관리자 지급", revoke: "관리자 회수", attend: "출석", roulette: "룰렛", admin: "관리자 조정" };
-const MEDALS = ["🥇", "🥈", "🥉"];
-const TABS = [["home", "👤", "내 정보"], ["stats", "📊", "통계"], ["rank", "🏆", "랭킹"], ["roulette", "🎡", "룰렛"]];
-let state = null, rankPeriod = null, spinning = false, turns = 0;
-const loaded = {};
+(() => {
+"use strict";
+const tg = window.Telegram?.WebApp, D = document, R = D.documentElement;
+const $ = (s, p = D) => p.querySelector(s), $$ = (s, p = D) => [...p.querySelectorAll(s)];
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+const fmt = (n) => Number(n || 0).toLocaleString("ko-KR");
+const kfmt = (v) => (v >= 1e8 ? +(v / 1e8).toFixed(1) + "억" : v >= 1e4 ? +(v / 1e4).toFixed(1) + "만" : fmt(v));
+const prize = (v) => (!v ? "꽝" : v >= 1e4 && v % 1e3 === 0 ? kfmt(v) : fmt(v));
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const f1 = (x) => +x.toFixed(1);
+const mono = (s) => (Array.from(String(s ?? "").trim())[0] || "·").toUpperCase();
+const still = matchMedia("(prefers-reduced-motion:reduce)").matches;
+const haptic = (k, a) => { try { tg?.HapticFeedback?.[k]?.(a); } catch {} };
+const utc = (d) => new Date(d + "T00:00:00Z");
+const wd = (d) => "일월화수목금토"[utc(d).getUTCDay()];
+const md = (d) => `${+d.slice(5, 7)}.${+d.slice(8, 10)}`;
+const dayName = (d) => (d === me.today ? "오늘" : +utc(me.today) - +utc(d) === 864e5 ? "어제" : `${+d.slice(5, 7)}월 ${+d.slice(8, 10)}일`);
+const PERIOD = { day: "일간", week: "주간", month: "월간", all: "전체" };
+const REASON = { grant: "관리자 지급", revoke: "관리자 회수", attend: "출석", roulette: "룰렛", admin: "관리자 조정" };
+const CHROME = { dark: ["#0D0C0A", "#110F0D"], light: ["#F2EDE3", "#FBF8F2"] };
+const IC = {
+  home: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4.5 20c.8-3.4 3.8-5.2 7.5-5.2s6.7 1.8 7.5 5.2",
+  stats: "M5 20v-7M12 20V4M19 20v-11",
+  rank: "M4 8.5l4.2 3.7L12 5.5l3.8 6.7L20 8.5 18.5 18h-13L4 8.5Z",
+  roulette: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 9.8a2.2 2.2 0 1 0 0 4.4 2.2 2.2 0 0 0 0-4.4ZM12 3v6.8M12 14.2V21M4.2 7.5l5.9 3.4M13.9 13.1l5.9 3.4M4.2 16.5l5.9-3.4M13.9 10.9l5.9-3.4",
+  ticket: "M4 9V7.5A1.5 1.5 0 0 1 5.5 6h13A1.5 1.5 0 0 1 20 7.5V9a3 3 0 0 0 0 6v1.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 16.5V15a3 3 0 0 0 0-6ZM14.5 9.5v1M14.5 13.5v1",
+  point: "M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17ZM10 16.2V8h2.7a2.5 2.5 0 0 1 0 5H10",
+  check: "M5.5 12.5l4.2 4.2 8.8-9.2",
+  list: "M9 7h10M9 12h10M9 17h10M5 7h.01M5 12h.01M5 17h.01",
+  lock: "M8 10.5V8a4 4 0 0 1 8 0v2.5M6.5 10.5h11A1.5 1.5 0 0 1 19 12v6.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 18.5V12a1.5 1.5 0 0 1 1.5-1.5ZM12 14.3v2.4",
+  offline: "M9 3.5V8M15 3.5V8M6.5 8h11v3a5.5 5.5 0 0 1-11 0V8ZM12 16.5V21",
+  refresh: "M19.5 12a7.5 7.5 0 1 1-2.3-5.4M19.5 4.5V8H16",
+};
+const icon = (n) => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="${IC[n]}"/></svg>`;
+const empty = (ic, a, b = "") => `<div class="empty">${ic ? icon(ic) : ""}<p>${a}</p><span>${b}</span></div>`;
+const cell = ([l, v, un, s]) => `<div class="cell"><p class="lab">${l}</p><p class="val"><b>${v}</b><i>${un}</i></p><p class="sub">${s}</p></div>`;
+const bar = (i, x, y0, h, w, s = -1) => { const r = Math.min(3, w / 2, h); return `<path style="--d:${i}" data-i="${i}" d="M${f1(x - w / 2)} ${y0}V${f1(y0 + s * (h - r))}q0 ${s * r} ${r} ${s * r}h${f1(w - 2 * r)}q${r} 0 ${r} ${-s * r}V${y0}Z"/>`; };
+const SK = (...h) => h.map((x) => `<div class="sk" style="height:${x}px"></div>`).join("");
 
-async function api(path, options = {}) {
-  const res = await fetch(path, { ...options, headers: { "X-Init-Data": tg?.initData || "" } });
+let me, tab, stats, period, seen = 0, busy = false, rot = 0, wedge, width = innerWidth;
+const ranks = {}, once = {};
+
+function theme() {
+  const t = (tg?.initData && tg.colorScheme || (matchMedia("(prefers-color-scheme:light)").matches ? "light" : "dark")) === "light" ? "light" : "dark";
+  R.dataset.theme = t;
+  ["setHeaderColor", "setBackgroundColor", "setBottomBarColor"].forEach((f, i) => { try { tg?.[f]?.(CHROME[t][i >> 1]); } catch {} });
+}
+
+async function api(path, method = "GET") {
+  let res;
+  try { res = await fetch(path, { method, headers: { "X-Init-Data": tg?.initData || "" } }); }
+  catch { throw Object.assign(new Error("네트워크 상태를 확인한 뒤 다시 시도해 주세요."), { status: 0 }); }
   const body = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(body.detail || "요청에 실패했습니다.");
+  if (!res.ok) throw Object.assign(new Error(typeof body.detail === "string" ? body.detail : "요청을 처리하지 못했습니다."), { status: res.status });
   return body;
 }
 
-function show(tab) {
-  document.querySelectorAll("section").forEach((s) => (s.hidden = s.dataset.tab !== tab));
-  document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("on", b.dataset.tab === tab));
-  if (tab === "stats" && !loaded.stats) loadStats();
-  if (tab === "rank" && !loaded.rank) loadRanking(rankPeriod);
-  window.scrollTo(0, 0);
+function enter(el) { el.classList.remove("in"); void el.offsetWidth; el.classList.add("in"); }
+
+function fit(el) {
+  el.style.fontSize = "";
+  const w = el.clientWidth, s = el.scrollWidth;
+  if (s > w) el.style.fontSize = Math.floor(parseFloat(getComputedStyle(el).fontSize) * w / s * 10) / 10 - .3 + "px";
 }
 
-function renderMe() {
-  const u = state.user;
-  $("name").textContent = u.name;
-  $("points").textContent = fmt(u.points);
-  $("tickets").textContent = fmt(u.tickets);
-  $("ticketTile").hidden = !state.roulette.enabled;
-  $("periodLabel").textContent = PERIODS[state.period];
-  $("rank").innerHTML = u.rank ? `${fmt(u.rank)}<small>위</small>` : `<small>기록 없음</small>`;
-  $("messages").textContent = fmt(u.messages);
-  $("attend").textContent = fmt(u.attend_total);
-  $("streak").textContent = `일 · 연속 ${u.attend_streak}일`;
-  $("logs").innerHTML = state.logs.length
-    ? state.logs.map((l) => {
-        const unit = l.kind === "points" ? "P" : "장";
-        const icon = l.kind === "points" ? "💰" : "🎟";
-        return `<div class="row"><div class="main"><div class="title">${icon} ${REASONS[l.reason] || l.reason}</div>
-          <div class="meta">${l.ts.slice(5, 16)} · 잔여 ${fmt(l.balance)} ${unit}</div></div>
-          <div class="num ${l.delta > 0 ? "up" : "down"}">${l.delta > 0 ? "+" : ""}${fmt(l.delta)} ${unit}</div></div>`;
-      }).join("")
-    : `<div class="empty">내역이 없습니다.</div>`;
-  renderSpinButton();
-}
-
-function barChart(el, items) {
-  const W = el.clientWidth || 320, H = 150, top = 8, bottom = 20, left = 0;
-  const max = Math.max(1, ...items.map((d) => d.value));
-  const step = (W - left) / items.length;
-  const bw = Math.max(2, Math.min(18, step - 2));
-  const ph = H - top - bottom;
-  const every = Math.ceil(items.length / 6);
-  let svg = `<line class="gridline" x1="0" x2="${W}" y1="${top}" y2="${top}"/><line class="gridline" x1="0" x2="${W}" y1="${top + ph / 2}" y2="${top + ph / 2}"/><line class="gridline" x1="0" x2="${W}" y1="${top + ph}" y2="${top + ph}"/>`;
-  svg += `<text x="${W}" y="${top - 2}" text-anchor="end">${fmt(max)}</text>`;
-  items.forEach((d, i) => {
-    const h = d.value ? Math.max(2, (d.value / max) * ph) : 0;
-    const x = left + i * step + (step - bw) / 2, y = top + ph - h, r = Math.min(4, bw / 2, h);
-    if (h) svg += `<path class="bar" data-i="${i}" d="M${x},${y + h}V${y + r}a${r},${r} 0 0 1 ${r},${-r}h${bw - 2 * r}a${r},${r} 0 0 1 ${r},${r}V${y + h}z"/>`;
-    if (i % every === 0) svg += `<text x="${x + bw / 2}" y="${H - 5}" text-anchor="middle">${d.label}</text>`;
-  });
-  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}">${svg}</svg><div class="tip"></div>`;
-  const tip = el.querySelector(".tip"), node = el.querySelector("svg");
-  const move = (e) => {
-    const rect = node.getBoundingClientRect();
-    const px = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-    const i = Math.max(0, Math.min(items.length - 1, Math.floor((px / rect.width) * items.length)));
-    el.querySelectorAll(".bar").forEach((b) => b.classList.toggle("dim", +b.dataset.i !== i));
-    tip.textContent = `${items[i].tip} · ${fmt(items[i].value)}${items[i].unit}`;
-    tip.style.display = "block";
-    tip.style.left = Math.max(50, Math.min(rect.width - 50, ((i + 0.5) / items.length) * rect.width)) + "px";
+function count(el, to, from = 0, ms = 900) {
+  const id = el._n = (el._n || 0) + 1, t0 = performance.now();
+  el.textContent = fmt(still ? to : from);
+  if (still || from === to) return;
+  const step = (t) => {
+    if (el._n !== id) return;
+    const p = Math.min(1, (t - t0) / ms);
+    el.textContent = fmt(Math.round(from + (to - from) * (1 - (1 - p) ** 4)));
+    if (p < 1) requestAnimationFrame(step);
   };
-  const leave = () => { tip.style.display = "none"; el.querySelectorAll(".bar").forEach((b) => b.classList.remove("dim")); };
-  node.addEventListener("mousemove", move);
-  node.addEventListener("touchstart", move, { passive: true });
-  node.addEventListener("touchmove", move, { passive: true });
-  node.addEventListener("mouseleave", leave);
-  node.addEventListener("touchend", leave);
+  requestAnimationFrame(step);
 }
 
-async function loadStats() {
-  const s = await api("/api/stats");
-  loaded.stats = true;
-  const t = s.totals;
-  const joins = s.daily.reduce((a, d) => a + d.joins, 0), leaves = s.daily.reduce((a, d) => a + d.leaves, 0);
-  const tiles = [
-    ["💬 오늘 채팅", t.messages_today, "회"], ["🙋 오늘 활동", t.active_today, "명"],
-    ["📈 7일 채팅", t.messages_week, "회"], ["👥 7일 활동", t.active_week, "명"],
-    ["🗂 집계 회원", t.members, "명"], ["🚪 30일 입장 / 퇴장", `${fmt(joins)} / ${fmt(leaves)}`, ""],
-  ];
-  $("kpis").innerHTML = tiles.map(([k, v, u]) => `<div class="tile"><div class="k">${k}</div><div class="v">${typeof v === "number" ? fmt(v) : v}<small>${u}</small></div></div>`).join("");
-  const day = (d) => `${+d.slice(5, 7)}.${+d.slice(8)}`;
-  barChart($("chartDaily"), s.daily.map((d) => ({ label: day(d.day), tip: day(d.day), value: d.messages, unit: "회" })));
-  barChart($("chartUsers"), s.daily.map((d) => ({ label: day(d.day), tip: day(d.day), value: d.users, unit: "명" })));
-  barChart($("chartHours"), s.hourly.map((v, h) => ({ label: `${h}시`, tip: `${h}시`, value: v, unit: "회" })));
+function nice(m) {
+  if (m <= 4) return m <= 0 ? 0 : m <= 2 ? 2 : 4;
+  const q = m / 4, p = 10 ** Math.floor(Math.log10(q));
+  return [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10].find((c) => c * p >= q) * p * 4;
 }
 
-async function loadRanking(period) {
-  rankPeriod = period;
-  $("periods").innerHTML = Object.entries(PERIODS).map(([k, v]) => `<button data-p="${k}" class="${k === period ? "on" : ""}">${v}</button>`).join("");
-  const r = await api(`/api/ranking?period=${period}`);
-  loaded.rank = true;
-  const me = state.user.id;
-  let html = r.rows.map((x, i) => `<div class="row ${x.id === me ? "me" : ""}">
-    <div class="pos ${i < 3 ? "medal" : ""}">${MEDALS[i] || i + 1}</div>
-    <div class="main"><div class="title">${esc(x.name)}</div></div><div class="num">${fmt(x.count)}</div></div>`).join("");
-  if (r.me.rank && r.me.rank > r.rows.length) html += `<div class="row me"><div class="pos">${r.me.rank}</div><div class="main"><div class="title">${esc(state.user.name)}</div></div><div class="num">${fmt(r.me.count)}</div></div>`;
-  $("ranking").innerHTML = html || `<div class="empty">아직 집계된 채팅이 없습니다.</div>`;
+function smooth(p) {
+  const n = p.length, d = [], m = [];
+  for (let i = 0; i < n - 1; i++) d[i] = (p[i + 1][1] - p[i][1]) / (p[i + 1][0] - p[i][0]);
+  for (let i = 0; i < n; i++) m[i] = !i ? d[0] : i === n - 1 ? d[n - 2] : d[i - 1] * d[i] <= 0 ? 0 : 2 * d[i - 1] * d[i] / (d[i - 1] + d[i]);
+  let s = `M${p[0]}`;
+  for (let i = 0; i < n - 1; i++) { const h = (p[i + 1][0] - p[i][0]) / 3; s += `C${p[i][0] + h} ${p[i][1] + m[i] * h} ${p[i + 1][0] - h} ${p[i + 1][1] - m[i + 1] * h} ${p[i + 1]}`; }
+  return s;
 }
 
-function slotLabel(p) { return p ? fmt(p) : "꽝"; }
-
-function renderWheel() {
-  const slots = state.roulette.slots, n = slots.length, a = (2 * Math.PI) / n;
-  const pt = (ang, r) => `${(Math.sin(ang) * r).toFixed(2)},${(-Math.cos(ang) * r).toFixed(2)}`;
-  $("wheel").innerHTML = slots.map((p, i) => {
-    const mid = (i + 0.5) * (360 / n);
-    return `<path class="${i % 2 ? "b" : "a"}" d="M0,0L${pt(i * a, 98)}A98,98 0 0 1 ${pt((i + 1) * a, 98)}z"/>
-      <text transform="rotate(${mid}) translate(0,-66)" text-anchor="middle" dominant-baseline="middle">${slotLabel(p)}</text>`;
-  }).join("") + `<circle r="98" fill="none" stroke="var(--line)" stroke-width="2"/>`;
+function scrub(el, n, pw, pick) {
+  const svg = $("svg", el);
+  let t;
+  const at = (e) => {
+    const x = (e.touches ? e.touches[0] : e).clientX - svg.getBoundingClientRect().left;
+    clearTimeout(t); el.classList.add("scrub"); pick(clamp(Math.floor(x / pw * n), 0, n - 1));
+  };
+  const end = () => { t = setTimeout(() => el.classList.remove("scrub"), 1200); };
+  ["touchstart", "touchmove", "mousemove"].forEach((k) => svg.addEventListener(k, at, { passive: true }));
+  ["touchend", "touchcancel", "mouseleave"].forEach((k) => svg.addEventListener(k, end));
 }
 
-function renderSpinButton() {
-  const t = state.user.tickets;
-  $("spin").textContent = t ? `돌리기 · 이용권 ${fmt(t)}장` : "이용권이 없습니다";
-  $("spin").disabled = spinning || !t;
+function chart(el, o) {
+  const v = o.v, n = v.length, W = el.clientWidth, H = o.h, pt = 22, pb = 20, pw = W - 30, ph = H - pt - pb, y0 = pt + ph;
+  const max = Math.max(0, ...v), top = nice(max), sw = pw / (n || 1);
+  const X = (i) => f1((i + .5) * sw), Y = (x) => f1(y0 - (top ? x / top * ph : 0));
+  let s = `<line class="gl b" x2="${pw}" y1="${y0}" y2="${y0}"/>`;
+  if (max) {
+    const ya = Y(v.reduce((a, b) => a + b, 0) / n), pk = v.indexOf(max);
+    [1, .5].forEach((k) => {
+      const y = Y(top * k);
+      s += `<line class="gl" x2="${pw}" y1="${y}" y2="${y}"/>` + (Math.abs(y - ya) < 14 ? "" : `<text class="tk" x="${W}" y="${y + 3.5}" text-anchor="end">${kfmt(top * k)}</text>`);
+    });
+    s += `<line class="avl" x2="${pw}" y1="${ya}" y2="${ya}"/><text class="tk" x="${W}" y="${ya + 3.5}" text-anchor="end">평균</text>`;
+    if (o.area) {
+      const p = v.map((x, i) => [X(i), Y(x)]), line = n > 1 ? smooth(p) : `M0 ${p[0][1]}H${pw}`;
+      s += `<path class="ar" d="${line}V${y0}H${n > 1 ? p[0][0] : 0}Z"/><path class="ln" d="${line}"/><circle class="dot end" cx="${p[n - 1][0]}" cy="${p[n - 1][1]}" r="3.5"/>`;
+    } else s += `<g class="bars">${v.map((x, i) => (x ? bar(i, X(i), y0, Math.max(2, x / top * ph), Math.min(o.bw, Math.max(2, sw - 3))) : "")).join("")}</g>`;
+    s += `<text class="pk" x="${clamp(X(pk), 16, pw - 16)}" y="${Y(max) - 7}" text-anchor="middle">${o.peak(pk)}</text>`;
+  } else s += `<text class="nil" x="${pw / 2}" y="${pt + ph / 2 + 4}" text-anchor="middle">기록 없음</text>`;
+  o.ticks.forEach(([i, t]) => { s += `<text class="tk" x="${!i ? 0 : i === n - 1 ? pw : X(i)}" y="${H - 3}" text-anchor="${!i ? "start" : i === n - 1 ? "end" : "middle"}">${t}</text>`; });
+  el.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${o.name}">${s}<line class="xh" y1="${pt - 4}" y2="${y0}"/>${o.area ? `<circle class="dot xd" r="3.5"/>` : ""}</svg><div class="tip"><span></span><b></b></div>`;
+  if (!n) return;
+  const xh = $(".xh", el), xd = $(".xd", el), tip = $(".tip", el), bars = $$(".bars path", el);
+  scrub(el, n, pw, (i) => {
+    bars.forEach((b) => b.classList.toggle("on", +b.dataset.i === i));
+    xh.setAttribute("x1", X(i)); xh.setAttribute("x2", X(i));
+    if (xd) { xd.setAttribute("cx", X(i)); xd.setAttribute("cy", Y(v[i])); }
+    [tip.firstChild.textContent, tip.lastChild.textContent] = o.tip(i);
+    tip.style.transform = `translateX(${clamp(X(i) - tip.offsetWidth / 2, 0, W - tip.offsetWidth)}px)`;
+  });
+}
+
+function flow(el, d) {
+  const n = d.length, W = el.clientWidth, H = 72, mid = 28, sw = W / (n || 1), bw = Math.min(5, Math.max(2, sw - 3)), X = (i) => f1((i + .5) * sw);
+  const u = 22 / Math.max(1, ...d.map((x) => Math.max(x.joins, x.leaves)));
+  const bars = (k, s) => d.map((x, i) => (x[k] ? bar(i, X(i), mid + s * 1.5, x[k] * u, bw, s) : "")).join("");
+  el.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="입장 · 퇴장"><line class="gl b" x2="${W}" y1="${mid}" y2="${mid}"/><g class="bars">${bars("joins", -1)}</g><g class="bars dn">${bars("leaves", 1)}</g>`
+    + (n ? `<text class="tk" y="${H - 3}">${md(d[0].day)}</text><text class="tk" x="${W}" y="${H - 3}" text-anchor="end">오늘</text>` : "")
+    + `<line class="xh" y1="2" y2="${H - 20}"/></svg><div class="tip"><span></span><b></b></div>`;
+  if (!n) return;
+  const xh = $(".xh", el), tip = $(".tip", el), marks = $$(".bars path", el);
+  scrub(el, n, W, (i) => {
+    const x = X(i);
+    marks.forEach((b) => b.classList.toggle("on", +b.dataset.i === i));
+    xh.setAttribute("x1", x); xh.setAttribute("x2", x);
+    tip.firstChild.textContent = `${md(d[i].day)} (${wd(d[i].day)})`; tip.lastChild.textContent = `입장 ${fmt(d[i].joins)} · 퇴장 ${fmt(d[i].leaves)}`;
+    tip.style.transform = `translateX(${clamp(x - tip.offsetWidth / 2, 0, W - tip.offsetWidth)}px)`;
+  });
+}
+
+function home() {
+  const u = me.user, t = me.today, P = PERIOD[me.period] || "", on = hasWheel(), dd = +t.slice(8);
+  $("#h-date").textContent = `${+t.slice(5, 7)}월 ${dd}일 ${wd(t)}요일`;
+  $("#c-brand").textContent = me.app_name;
+  $("#c-name").textContent = u.name;
+  $("#c-user").textContent = u.username ? "@" + u.username : "";
+  $("#c-since").textContent = String(u.joined_at || "").slice(0, 10).replace(/-/g, ".");
+  const pts = $("#c-pts");
+  pts.textContent = fmt(u.points); fit(pts.parentNode); count(pts, u.points, seen); seen = u.points;
+
+  const cells = [[`${P} 순위`, u.rank ? fmt(u.rank) : "–", u.rank ? "위" : "", u.rank_total ? `${fmt(u.rank_total)}명 중` : "기록 없음"],
+    ["누적 채팅", fmt(u.messages), "회", me.period === "all" ? "전체 기간" : `${P} ${fmt(u.rank_count)}회`]];
+  if (on) cells.unshift(["이용권", fmt(u.tickets), "장", "룰렛 1회 1장"]);
+  $("#h-strip").innerHTML = cells.map(cell).join("");
+
+  const y = +t.slice(0, 4), m = +t.slice(5, 7), dim = new Date(Date.UTC(y, m, 0)).getUTCDate(), first = new Date(Date.UTC(y, m - 1, 1)).getUTCDay();
+  const got = new Set(me.attend_days.map((d) => +d.slice(8)));
+  if (u.attended_today) got.add(dd);
+  const ticks = Array.from({ length: dim }, (_, i) => {
+    const d = i + 1, lab = d === dd || (d === 1 && dd > 2) || (d === dim && dd < dim - 1);
+    return `<i class="${got.has(d) ? "y" : d < dd ? "n" : d === dd ? "t" : ""}${d === dd ? " now" : ""}${i && (first + i) % 7 === 0 ? " wk" : ""}">${lab ? `<span>${d}</span>` : ""}</i>`;
+  }).join("");
+  $("#h-att").innerHTML = `<div class="ph"><h2>출석</h2>${u.attended_today ? `<span class="chip">${icon("check")}오늘 완료</span>` : `<span class="chip off">오늘 미출석</span>`}</div>`
+    + `<div class="streak"><p class="val"><b>${fmt(u.attend_streak)}</b><i>일 연속</i></p><span>누적 <b>${fmt(u.attend_total)}</b>일 · ${m}월 <b>${got.size}</b>일</span></div>`
+    + `<div class="ruler">${ticks}</div>` + (u.attended_today ? "" : `<p class="hint">그룹방에 <b>/출석</b>을 입력하면 출석됩니다.</p>`);
+
+  const a = me.activity, av = a.map((x) => x.count), n = a.length;
+  $("#h-act").innerHTML = `<div class="ph"><h2>내 채팅<small>${n}일</small></h2><span>일평균 <b>${fmt(Math.round(av.reduce((p, c) => p + c, 0) / (n || 1)))}</b>회</span></div><div class="chart"></div>`;
+  chart($("#h-act .chart"), { name: "내 채팅", v: av, h: 128, bw: 8, peak: (i) => fmt(av[i]), ticks: n ? [[0, md(a[0].day)], [n >> 1, md(a[n >> 1].day)], [n - 1, "오늘"]] : [], tip: (i) => [`${md(a[i].day)} (${wd(a[i].day)})`, `${fmt(av[i])}회`] });
+
+  let day;
+  const logs = me.logs.filter((l) => on || l.kind === "points");
+  $("#h-logs").innerHTML = `<div class="ph"><h2>최근 내역</h2></div>` + (logs.length ? logs.map((l) => {
+    const d = l.ts.slice(0, 10), p = l.kind === "points", un = p ? " P" : "장";
+    return (d === day ? "" : `<p class="grp">${dayName(day = d)}</p>`) + `<div class="row"><span class="ico">${icon(p ? "point" : "ticket")}</span><div class="rm"><b>${esc(REASON[l.reason] || l.reason)}</b><span>${esc(l.ts.slice(11, 16))} · ${p ? "잔액" : "잔여"} ${fmt(l.balance)}${un}</span></div><em class="${l.delta < 0 ? "neg" : "pos"}">${l.delta < 0 ? "−" : "+"}${fmt(Math.abs(l.delta))}${un}</em></div>`;
+  }).join("") : empty("list", "내역 없음", on ? "포인트와 이용권 변동이 여기에 기록됩니다." : "포인트 변동이 여기에 기록됩니다."));
+  $$("#v-home .val").forEach(fit);
+}
+
+async function drawStats() {
+  const el = $("#s-body");
+  if (!stats) {
+    el.innerHTML = SK(290, 214, 214);
+    try { stats = await api("/api/stats"); } catch (e) { return fail(el, e, drawStats); }
+    if (tab !== "stats") return;
+  }
+  const t = stats.totals, d = stats.daily, h = stats.hourly, n = d.length, sum = (k) => d.reduce((a, x) => a + x[k], 0), avg = (k) => fmt(Math.round(sum(k) / (n || 1)));
+  const k = [["오늘 채팅", t.messages_today, "회", `7일 ${fmt(t.messages_week)}회`], ["오늘 활동", t.active_today, "명", `7일 ${fmt(t.active_week)}명`],
+    ["회원", t.members, "명", `누적 채팅 ${fmt(t.messages_all)}회`], ["전체 포인트", t.points, " P", hasWheel() ? `이용권 ${fmt(t.tickets)}장` : "회원 보유 합계"]];
+  const j = sum("joins"), l = sum("leaves"), hp = h.indexOf(Math.max(...h));
+  const head = (a, b, c, x = "") => `<div class="panel"><div class="ph"><h2>${a}<small>${b}</small></h2>${c}</div>${x}<div class="chart"></div></div>`;
+  el.innerHTML = `<div class="panel strip kpi">${k.map(([a, v, un, s]) => cell([a, `<span data-n="${+v || 0}">${fmt(v)}</span>`, un, s])).join("")}</div>`
+    + head("일별 채팅", `${n}일`, `<span>일평균 <b>${avg("messages")}</b>회</span>`) + head("일별 활동 인원", `${n}일`, `<span>일평균 <b>${avg("users")}</b>명</span>`)
+    + head("시간대별 채팅", `${n}일 합계`, Math.max(...h) ? `<span>최다 <b>${hp}시</b></span>` : "")
+    + head("입장 · 퇴장", `${n}일`, `<span>순증 <b>${j - l > 0 ? "+" : j - l < 0 ? "−" : ""}${fmt(Math.abs(j - l))}</b>명</span>`, `<p class="lg"><span><i></i>입장<b>${fmt(j)}</b></span><span><i></i>퇴장<b>${fmt(l)}</b></span></p>`);
+  const c = $$(".chart", el), wk = Array.from({ length: Math.ceil(n / 7) }, (_, i) => n - 1 - i * 7).map((i) => [i, i === n - 1 ? "오늘" : md(d[i].day)]);
+  const daily = (name, key, un, area) => ({ name, v: d.map((x) => x[key]), h: 140, bw: 5, area, peak: (i) => fmt(d[i][key]), ticks: wk, tip: (i) => [`${md(d[i].day)} (${wd(d[i].day)})`, fmt(d[i][key]) + un] });
+  chart(c[0], daily("일별 채팅", "messages", "회"));
+  chart(c[1], daily("일별 활동 인원", "users", "명", 1));
+  chart(c[2], { name: "시간대별 채팅", v: h, h: 132, bw: 6, peak: (i) => `${i}시`, ticks: [0, 6, 12, 18, 23].map((i) => [i, `${i}시`]), tip: (i) => [`${i}시`, `${fmt(h[i])}회`] });
+  flow(c[3], d);
+  $$(".val", el).forEach(fit);
+  if (!once.stats) $$("[data-n]", el).forEach((b) => count(b, +b.dataset.n));
+  once.stats = 1;
+  enter(el);
+}
+
+const rrow = (rank, name, cnt, mine) => `<div class="row${mine ? " me" : ""}"><span class="rk">${rank}</span><span class="av">${esc(mono(name))}</span><span class="nm"><b>${esc(name)}</b>${mine ? `<i class="tag">나</i>` : ""}</span><em>${cnt}</em></div>`;
+
+async function drawRank(p = period) {
+  const el = $("#r-body"), pin = $("#r-pin"), uid = me.user.id;
+  period = p;
+  $$("#r-seg button").forEach((b, i) => { const on = b.dataset.period === p; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); if (on) $("#r-seg").style.setProperty("--k", i); });
+  let r = ranks[p];
+  if (!r) {
+    el.innerHTML = SK(232, 330); pin.hidden = true;
+    try { r = ranks[p] = await api("/api/ranking?period=" + p); } catch (e) { return fail(el, e, () => drawRank(p)); }
+    if (period !== p || tab !== "rank") return;
+  }
+  const rows = r.rows || [], out = rows.length > 0 && !rows.some((x) => x.id === uid);
+  $("#r-total").textContent = r.total ? `참여 ${fmt(r.total)}명` : "";
+  const pod = (i) => { const x = rows[i]; return `<div class="pod p${i + 1}${x?.id === uid ? " me" : ""}">${i ? "" : icon("rank")}<span class="av">${x ? esc(mono(x.name)) : ""}</span><b>${x ? esc(x.name) : "–"}</b><span>${x ? fmt(x.count) + "회" : "&nbsp;"}</span><div class="pl">${i + 1}</div></div>`; };
+  el.innerHTML = `<div class="podium">${pod(1)}${pod(0)}${pod(2)}</div>` + (rows.length > 3 ? `<div class="panel rows">${rows.slice(3).map((x, i) => rrow(i + 4, x.name, fmt(x.count), x.id === uid)).join("")}</div>`
+    : rows.length ? "" : `<div class="panel rows">${empty("", "집계된 채팅 없음", "이 기간에 채팅한 회원이 없습니다.")}</div>`);
+  pin.hidden = !out; $("#v-rank").classList.toggle("pinned", out);
+  pin.innerHTML = out ? rrow(r.me?.rank ? fmt(r.me.rank) : "–", me.user.name, r.me?.rank ? fmt(r.me.count) : "기록 없음", 1) : "";
+  enter(el);
+}
+
+const hasWheel = () => me.roulette.enabled && me.roulette.slots.length > 1;
+const best = () => { const s = me.roulette.slots.filter(Boolean); return new Set(s).size > 1 ? Math.max(...s) : Infinity; };
+
+function buildWheel() {
+  const s = me.roulette.slots, n = s.length, th = 360 / n, top = best(), solid = n > 3;
+  const pt = (d, r) => { const a = d * Math.PI / 180; return `${+(Math.sin(a) * r).toFixed(2)} ${+(-Math.cos(a) * r).toFixed(2)}`; };
+  const em = (t) => [...t].reduce((a, c) => a + (c >= "0" && c <= "9" ? .6 : c === "," || c === "." ? .26 : 1), 0);
+  const fs = [28, 28, 28, 26, 22, 20, 18.5, 17.5, 16.5, 15.5, 14.5, 14, 13.5][n] || 13, across = 2 * (solid ? 98 : 80) * Math.sin(Math.PI / n) * .74;
+  const radial = Math.max(...s.map((v) => em(prize(v)))) * fs > across * 1.4, rl = radial ? 90 : solid ? 98 : 80, room = radial ? 84 : across;
+  wedge = (i) => `M0 0L${pt(i * th, 137)}A137 137 0 0 1 ${pt((i + 1) * th, 137)}Z`;
+  let seg = "", sep = "", peg = "", lab = "";
+  s.forEach((v, i) => {
+    const hi = v === top, text = prize(v);
+    seg += `<path class="${hi ? (solid ? "w-top" : "w-tint") : "w" + (n % 2 && i === n - 1 ? 2 : i % 2)}" d="${wedge(i)}"/>`;
+    sep += `<path d="M${pt(i * th, 34)}L${pt(i * th, 137)}"/>`;
+    peg += `<circle r="2.3" transform="rotate(${i * th}) translate(0 -129)"/>`;
+    lab += `<text transform="rotate(${(i + .5) * th}) translate(0 ${-rl})${radial ? " rotate(-90)" : ""}" dy=".36em" font-size="${f1(Math.min(fs, room / em(text)))}"${hi ? ` class="${solid ? "t-top" : "t-tint"}"` : v ? "" : ` class="t-nil"`}>${text}</text>`;
+  });
+  const box = `viewBox="-160 -160 320 320" aria-hidden="true"`;
+  rot = 360 - (s.indexOf(Math.max(...s)) + .5) * th;
+  $("#wheel").innerHTML = `<div class="bezel"></div>`
+    + `<svg ${box}><circle r="144.2" fill="none" stroke="#090807" stroke-width="12.6"/><circle r="144.2" fill="none" stroke="#8F7240" stroke-width="4" stroke-dasharray=".9 14.2" opacity=".8"/><circle r="150.5" fill="none" stroke="#000" stroke-opacity=".6"/></svg>`
+    + `<svg ${box} id="disc" style="transform:rotate(${rot}deg)"><circle r="138" fill="#0A0908"/>${seg}<g class="w-sep">${sep}</g><circle class="w-ring" r="137"/><g class="w-peg">${peg}</g><g class="w-lab" text-anchor="middle">${lab}</g><path class="hit" id="hit"/><circle r="35" fill="#0C0B09"/><circle class="w-ring" r="35"/></svg>`
+    + `<svg ${box}><circle r="137.5" fill="url(#gSheen)"/><circle r="29" cy="3" fill="#000" opacity=".5"/><circle r="26" fill="url(#gHub)" stroke="url(#gGold)" stroke-width="2.5"/><path d="M0-9 6.6 0 0 9-6.6 0Z" fill="url(#gGold)"/>`
+    + `<path d="M0-123 10-157H-10Z" opacity=".45"/><path d="M0-126-9.5-158H0Z" fill="#F6EAC8"/><path d="M0-126 9.5-158H0Z" fill="#B28E50"/><path d="M0-126 9.5-158H-9.5Z" fill="none" stroke="#17120A" stroke-width=".75" stroke-linejoin="round"/></svg>`;
+}
+
+function readout(s, pts) {
+  const u = me.user, el = $("#ro"), have = `보유 ${fmt(u.points)} P · 이용권 ${fmt(u.tickets)}장`, won = `<b class="foil">+<span>0</span></b><i>P</i>`, left = `<b>${fmt(u.tickets)}</b><i>장</i>`;
+  const [a, b, c] = { idle: ["이용권", left, u.tickets ? "1회에 1장 사용" : "이용권은 관리자가 지급합니다"], spin: ["이용권", left, "1회에 1장 사용"], lose: ["결과", "<b>꽝</b>", have], win: ["당첨", won, have], top: ["최고 당첨", won, have] }[s];
+  const fresh = el.dataset.s !== s;
+  el.dataset.s = s;
+  el.innerHTML = `<p class="ro-l">${a}</p><p class="ro-v">${b}</p><p class="ro-s">${c}</p>`;
+  if (pts) count($("span", el), pts, 0, 800);
+  fit($(".ro-v", el));
+  if (fresh) enter(el);
+}
+
+function cta() {
+  const b = $("#spin"), t = me.user.tickets;
+  b.disabled = busy || !t; b.classList.toggle("busy", busy);
+  b.textContent = busy ? "추첨 중" : t ? "돌리기" : "이용권 없음";
+}
+
+function winners() {
+  const w = me.roulette.recent, top = best();
+  $("#w-recent").innerHTML = `<div class="ph"><h2>최근 당첨</h2></div>` + (w.length ? w.map((x) => {
+    const d = x.ts.slice(0, 10);
+    return `<div class="row"><span class="av">${esc(mono(x.name))}</span><div class="rm"><b>${esc(x.name)}</b><span>${d === me.today ? "" : dayName(d) + " "}${esc(x.ts.slice(11, 16))}</span></div><em${x.points >= top ? ` class="gold"` : ""}>+${fmt(x.points)} P</em></div>`;
+  }).join("") : empty("roulette", "당첨 기록 없음"));
+}
+
+function turn(i) {
+  const disc = $("#disc"), th = 360 / me.roulette.slots.length, A = (x) => ({ transform: `rotate(${x}deg)` });
+  const to = (still ? 720 : 2520) - (i + .5 + (Math.random() - .5) * .56) * th;
+  const a = disc.animate(still ? [A(rot), A(to)] : [{ ...A(rot), easing: "cubic-bezier(.45,0,.55,1)" }, { ...A(rot - 16), offset: .075, easing: "cubic-bezier(.15,.6,.25,1)" }, A(to)], { duration: still ? 600 : 5400, fill: "forwards" });
+  rot = to % 360;
+  return a.finished.then(() => { disc.style.transform = `rotate(${rot}deg)`; a.cancel(); });
+}
+
+function celebrate(big) {
+  if (still) return;
+  const fx = $("#fx"), b = $("#wheel").getBoundingClientRect(), R = b.width / 2, cx = b.left + R, cy = b.top + R;
+  const add = (tag, css, frames, opt) => { const e = D.createElement(tag); e.style.cssText = css; fx.append(e); e.animate(frames, { fill: "both", ...opt }).onfinish = () => e.remove(); };
+  for (let k = 0; k < (big ? 3 : 1); k++) add("b", `left:${b.left}px;top:${b.top}px;width:${b.width}px;height:${b.height}px`, [{ transform: "scale(.95)", opacity: .9 }, { transform: "scale(1.13)", opacity: 0 }], { duration: 1200, delay: k * 340, easing: "cubic-bezier(.2,.7,.2,1)" });
+  for (let k = 0; big && k < 48; k++) {
+    const a = Math.random() * 6.283, c = Math.cos(a), s = Math.sin(a), d = R * (.12 + Math.random() * .5), z = .5 + Math.random(), r = Math.random() * 540 - 270;
+    add("i", `left:${cx + c * R * .97}px;top:${cy + s * R * .97}px`, [{ transform: "scale(0)", opacity: 0, easing: "cubic-bezier(.1,.7,.3,1)" }, { transform: `translate(${c * d}px,${s * d}px) scale(${z}) rotate(${r}deg)`, opacity: 1, offset: .5, easing: "cubic-bezier(.5,0,.9,.6)" }, { transform: `translate(${c * d * 1.15}px,${s * d + R * .55}px) scale(${z * .7}) rotate(${r * 1.7}deg)`, opacity: 0 }], { duration: 2400 + Math.random() * 1000, delay: Math.random() * 150 });
+  }
 }
 
 async function spin() {
-  if (spinning) return;
-  spinning = true;
-  renderSpinButton();
-  $("result").innerHTML = "";
-  try {
-    const r = await api("/api/spin", { method: "POST" });
-    const n = state.roulette.slots.length;
-    turns += 6;
-    $("wheel").style.transform = `rotate(${turns * 360 - (r.index + 0.5) * (360 / n)}deg)`;
-    state.user.tickets = r.tickets;
-    await new Promise((ok) => setTimeout(ok, 4300));
-    state.user.points = r.balance;
-    $("result").innerHTML = r.points ? `🎉 <b>+${fmt(r.points)} P</b><div class="sub">보유 ${fmt(r.balance)} P</div>` : `<b>꽝</b><div class="sub">다음 기회에</div>`;
-    tg?.HapticFeedback?.notificationOccurred(r.points ? "success" : "warning");
-    api("/api/me").then((s) => { state = s; renderMe(); });
-  } catch (e) {
-    $("result").innerHTML = `<div class="sub">${esc(e.message)}</div>`;
+  const u = me.user, hit = $("#hit");
+  if (busy || !u.tickets) return;
+  busy = true; R.dataset.spinning = "1";
+  cta(); readout("spin"); hit.classList.remove("on"); haptic("impactOccurred", "medium");
+  let r;
+  try { r = await api("/api/spin", "POST"); }
+  catch (e) {
+    busy = false; delete R.dataset.spinning;
+    if (e.status === 409) u.tickets = 0;
+    cta(); readout("idle"); $(".ro-s").textContent = e.message; haptic("notificationOccurred", "error");
+    return;
   }
-  spinning = false;
-  renderMe();
+  u.tickets = r.tickets; readout("spin");
+  await turn(r.index);
+  const kind = !r.points ? "lose" : r.points >= best() ? "top" : "win";
+  u.points = r.balance;
+  if (r.points) me.roulette.recent = [{ name: u.name, points: r.points, ts: new Date(Date.now() + 324e5).toISOString().slice(0, 19).replace("T", " ") }, ...me.roulette.recent].slice(0, 10);
+  hit.setAttribute("d", wedge(r.index)); hit.classList.add("on");
+  busy = false;
+  readout(kind, r.points); winners(); cta();
+  haptic("notificationOccurred", r.points ? "success" : "warning");
+  if (r.points && tab === "roulette") celebrate(kind === "top");
+  delete R.dataset.spinning;
+  api("/api/me").then((m) => {
+    if (busy) return;
+    const same = String(m.roulette.slots) === String(me.roulette.slots);
+    me = m;
+    if (!same) buildWheel();
+    if (tab === "home") home(); else if (tab === "roulette") { winners(); cta(); }
+  }).catch(() => {});
+}
+
+function fail(el, e, again) {
+  el.innerHTML = `<div class="panel empty">${icon(e.status ? "lock" : "offline")}<p></p><button class="ghost">${icon("refresh")}다시 시도</button></div>`;
+  $("p", el).textContent = e.message;
+  $("button", el).onclick = again;
+}
+
+function gate(e) {
+  const g = $("#gate"), retry = !e.status || e.status >= 500;
+  g.innerHTML = `<div class="g-em">${icon(e.status ? "lock" : "offline")}</div><h1>${!e.status ? "연결할 수 없습니다" : e.status === 401 ? "텔레그램 전용" : e.status === 403 ? "회원 전용" : "일시적인 오류"}</h1><p></p>` + (retry ? `<button class="ghost">${icon("refresh")}다시 시도</button>` : "");
+  $("p", g).textContent = e.message;
+  if (retry) $("button", g).onclick = () => { g.hidden = true; $("#boot").hidden = false; init(); };
+  $("#boot").hidden = true; g.hidden = false;
+  R.dataset.ready = "1";
+}
+
+const draw = { home, stats: drawStats, rank: drawRank, roulette: () => { if (!busy) { readout("idle"); $("#hit").classList.remove("on"); } winners(); cta(); } };
+
+function show(t) {
+  if (t === tab) return scrollTo({ top: 0, behavior: still ? "auto" : "smooth" });
+  tab = t;
+  $$(".view").forEach((v) => v.classList.toggle("on", v.id === "v-" + t));
+  $$("#tabs button").forEach((b, i) => { const on = b.dataset.tab === t; b.classList.toggle("on", on); on ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current"); if (on) $("#tabs").style.setProperty("--k", i); });
+  scrollTo(0, 0);
+  enter($("#v-" + t));
+  draw[t]();
 }
 
 async function init() {
-  tg?.ready(); tg?.expand();
-  try {
-    state = await api("/api/me");
-  } catch (e) {
-    $("gate").textContent = e.message;
-    return;
+  try { me = await api("/api/me"); } catch (e) { return gate(e); }
+  const nav = $("#tabs"), tabs = [["home", "내 정보"], ["stats", "통계"], ["rank", "랭킹"]], u = me.user, url = tg?.initDataUnsafe?.user?.photo_url, ava = $("#c-ava");
+  period = PERIOD[me.period] ? me.period : "week";
+  D.title = me.app_name || D.title;
+  ava.textContent = mono(u.name);
+  if (/^https:\/\//.test(url || "")) { const img = new Image(); img.alt = ""; img.referrerPolicy = "no-referrer"; img.onload = () => ava.replaceChildren(img); img.src = url; }
+  $("#guil").innerHTML = [30, 58].map((ry) => Array.from({ length: 36 }, (_, k) => `<ellipse rx="96" ry="${ry}" transform="rotate(${k * 5})"/>`).join("")).join("");
+  if (hasWheel()) {
+    tabs.push(["roulette", "룰렛"]);
+    $("#app").insertAdjacentHTML("beforeend", `<section class="view" id="v-roulette"><header class="top"><h1>룰렛</h1><p>최고 ${fmt(Math.max(...me.roulette.slots))} P</p></header><div class="wheel-box noir"><div class="wheel" id="wheel"></div></div><div class="ro" id="ro" aria-live="polite"></div><button class="cta" id="spin"></button><div class="panel list" id="w-recent"></div></section>`);
+    buildWheel();
+    $("#spin").onclick = spin;
   }
-  rankPeriod = state.period;
-  const tabs = TABS.filter(([k]) => k !== "roulette" || state.roulette.enabled);
-  $("nav").innerHTML = tabs.map(([k, i, t]) => `<button data-tab="${k}"><i>${i}</i>${t}</button>`).join("");
-  $("nav").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) show(b.dataset.tab); });
-  $("periods").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) loadRanking(b.dataset.p); });
-  $("spin").addEventListener("click", spin);
-  if (state.roulette.enabled) renderWheel();
-  renderMe();
-  $("gate").hidden = true; $("app").hidden = false; $("nav").hidden = false;
+  nav.innerHTML = `<i class="ind"></i>` + tabs.map(([k, l]) => `<button data-tab="${k}">${icon(k)}<span>${l}</span></button>`).join("");
+  nav.style.setProperty("--n", tabs.length);
+  $("#boot").hidden = true; $("#app").hidden = nav.hidden = false;
   show("home");
+  R.dataset.ready = "1";
 }
+
+$("#tabs").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; if (b.dataset.tab !== tab) haptic("selectionChanged"); show(b.dataset.tab); };
+$("#r-seg").onclick = (e) => { const b = e.target.closest("button"); if (b && b.dataset.period !== period) { haptic("selectionChanged"); drawRank(b.dataset.period); } };
+addEventListener("resize", () => { if (innerWidth === width) return; width = innerWidth; if (tab && tab !== "roulette") draw[tab](); });
+D.fonts?.ready.then(() => $$(".bal,.val,.ro-v").forEach((el) => el.offsetParent && fit(el)));
+tg?.onEvent?.("themeChanged", theme);
+tg?.ready?.(); tg?.expand?.();
+theme();
 init();
+})();
 </script>
 </body>
 </html>
