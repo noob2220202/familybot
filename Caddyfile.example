@@ -1,0 +1,7 @@
+jypteam.cloud {
+	reverse_proxy 127.0.0.1:9200
+}
+
+admin.jypteam.cloud {
+	reverse_proxy 127.0.0.1:9201
+}

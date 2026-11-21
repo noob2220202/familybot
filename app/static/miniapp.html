@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>패밀리봇</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root {
+  --bg: var(--tg-theme-secondary-bg-color, #f1f2f5);
+  --card: var(--tg-theme-section-bg-color, var(--tg-theme-bg-color, #ffffff));
+  --text: var(--tg-theme-text-color, #14161a);
+  --hint: var(--tg-theme-hint-color, #7d8591);
+  --accent: var(--tg-theme-button-color, #2f7cf6);
+  --on-accent: var(--tg-theme-button-text-color, #ffffff);
+  --line: color-mix(in srgb, var(--hint) 22%, transparent);
+  --soft: color-mix(in srgb, var(--accent) 12%, transparent);
+  --up: #1f9d61;
+  --down: #d9483b;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: var(--tg-theme-secondary-bg-color, #0f1114);
+    --card: var(--tg-theme-section-bg-color, var(--tg-theme-bg-color, #1a1d22));
+    --text: var(--tg-theme-text-color, #f2f4f7);
+    --hint: var(--tg-theme-hint-color, #8b93a0);
+    --up: #3ecf8e;
+    --down: #ff6b5e;
+  }
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif;
+  padding: 16px 16px calc(84px + env(safe-area-inset-bottom));
+}
+h1 { font-size: 22px; margin: 4px 0 2px; letter-spacing: -.02em; }
+h2 { font-size: 13px; font-weight: 600; color: var(--hint); margin: 22px 4px 8px; }
+.sub { color: var(--hint); font-size: 13px; }
+.card { background: var(--card); border-radius: 16px; padding: 16px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tile { background: var(--card); border-radius: 16px; padding: 14px 16px; }
+.tile .k { font-size: 12.5px; color: var(--hint); }
+.tile .v { font-size: 22px; font-weight: 700; letter-spacing: -.02em; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.tile .v small { font-size: 13px; font-weight: 600; color: var(--hint); margin-left: 3px; }
+.tile.wide { grid-column: 1 / -1; }
+.hero { background: var(--accent); color: var(--on-accent); }
+.hero .k { color: inherit; opacity: .8; }
+.hero .v { font-size: 30px; }
+.hero .v small { color: inherit; opacity: .8; }
+.list { background: var(--card); border-radius: 16px; overflow: hidden; }
+.row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
+.row + .row { border-top: 1px solid var(--line); }
+.row .main { flex: 1; min-width: 0; }
+.row .title { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row .meta { font-size: 12px; color: var(--hint); }
+.row .num { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.row.me { background: var(--soft); }
+.pos { width: 30px; text-align: center; font-weight: 700; color: var(--hint); font-variant-numeric: tabular-nums; }
+.pos.medal { font-size: 20px; }
+.up { color: var(--up); } .down { color: var(--down); }
+.empty { padding: 28px 16px; text-align: center; color: var(--hint); }
+.seg { display: flex; background: var(--card); border-radius: 12px; padding: 4px; gap: 4px; margin-bottom: 12px; }
+.seg button { flex: 1; border: 0; background: none; color: var(--hint); font: inherit; font-weight: 600; padding: 8px 0; border-radius: 9px; }
+.seg button.on { background: var(--accent); color: var(--on-accent); }
+nav {
+  position: fixed; left: 0; right: 0; bottom: 0; display: flex; background: var(--card);
+  border-top: 1px solid var(--line); padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+}
+nav button { flex: 1; border: 0; background: none; color: var(--hint); font: inherit; font-size: 11.5px; font-weight: 600; padding: 6px 0; border-radius: 12px; }
+nav button i { display: block; font-style: normal; font-size: 21px; line-height: 1.2; filter: grayscale(1); opacity: .65; }
+nav button.on { color: var(--accent); }
+nav button.on i { filter: none; opacity: 1; }
+.chart { position: relative; }
+.chart svg { display: block; width: 100%; height: 150px; overflow: visible; }
+.chart .bar { fill: var(--accent); }
+.chart .bar.dim { opacity: .35; }
+.chart .gridline { stroke: var(--line); stroke-width: 1; }
+.chart text { fill: var(--hint); font-size: 10.5px; font-variant-numeric: tabular-nums; }
+.tip {
+  position: absolute; top: -6px; transform: translate(-50%, -100%); background: var(--text); color: var(--card);
+  font-size: 12px; font-weight: 600; padding: 5px 9px; border-radius: 8px; white-space: nowrap; pointer-events: none; display: none;
+}
+.wheel-wrap { position: relative; width: min(78vw, 320px); aspect-ratio: 1; margin: 8px auto 18px; }
+.wheel { width: 100%; height: 100%; transition: transform 4.2s cubic-bezier(.12, .7, .1, 1); }
+.wheel text { font-size: 15px; font-weight: 700; fill: var(--text); }
+.wheel .a { fill: var(--card); } .wheel .b { fill: var(--soft); }
+.wheel path { stroke: var(--line); stroke-width: 1; }
+.pointer { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border: 12px solid transparent; border-top: 20px solid var(--accent); z-index: 1; }
+.hub { position: absolute; inset: 41%; border-radius: 50%; background: var(--accent); border: 4px solid var(--card); }
+.btn { display: block; width: 100%; border: 0; border-radius: 14px; padding: 15px; background: var(--accent); color: var(--on-accent); font: inherit; font-size: 16px; font-weight: 700; }
+.btn:disabled { opacity: .45; }
+.result { text-align: center; min-height: 54px; margin-top: 14px; }
+.result b { font-size: 24px; letter-spacing: -.02em; }
+.center { text-align: center; }
+#gate { padding: 30vh 24px 0; text-align: center; color: var(--hint); }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div id="gate">불러오는 중…</div>
+<main id="app" hidden>
+  <section data-tab="home">
+    <div class="sub">내 정보</div>
+    <h1 id="name"></h1>
+    <div class="grid" style="margin-top:14px">
+      <div class="tile wide hero"><div class="k">💰 보유 포인트</div><div class="v"><span id="points"></span><small>P</small></div></div>
+      <div class="tile" id="ticketTile"><div class="k">🎟 룰렛 이용권</div><div class="v"><span id="tickets"></span><small>장</small></div></div>
+      <div class="tile"><div class="k">🏆 <span id="periodLabel"></span> 순위</div><div class="v" id="rank"></div></div>
+      <div class="tile"><div class="k">💬 누적 채팅</div><div class="v"><span id="messages"></span><small>회</small></div></div>
+      <div class="tile"><div class="k">📆 출석</div><div class="v"><span id="attend"></span><small id="streak"></small></div></div>
+    </div>
+    <h2>최근 내역</h2>
+    <div class="list" id="logs"></div>
+  </section>
+
+  <section data-tab="stats" hidden>
+    <div class="sub">그룹방</div>
+    <h1>통계</h1>
+    <div class="grid" style="margin-top:14px" id="kpis"></div>
+    <h2>일별 채팅 · 최근 30일</h2>
+    <div class="card"><div class="chart" id="chartDaily"></div></div>
+    <h2>일별 활동 인원 · 최근 30일</h2>
+    <div class="card"><div class="chart" id="chartUsers"></div></div>
+    <h2>시간대별 채팅 · 최근 30일 합계</h2>
+    <div class="card"><div class="chart" id="chartHours"></div></div>
+  </section>
+
+  <section data-tab="rank" hidden>
+    <div class="sub">채팅 횟수</div>
+    <h1>랭킹</h1>
+    <div class="seg" id="periods" style="margin-top:14px"></div>
+    <div class="list" id="ranking"></div>
+  </section>
+
+  <section data-tab="roulette" hidden>
+    <div class="sub">이용권 1장 = 1회</div>
+    <h1>룰렛</h1>
+    <div class="card" style="margin-top:14px">
+      <div class="wheel-wrap"><div class="pointer"></div><svg class="wheel" id="wheel" viewBox="-100 -100 200 200"></svg><div class="hub"></div></div>
+      <button class="btn" id="spin"></button>
+      <div class="result" id="result"></div>
+    </div>
+  </section>
+</main>
+<nav id="nav" hidden></nav>
+
+<script>
+const tg = window.Telegram?.WebApp;
+const $ = (id) => document.getElementById(id);
+const fmt = (n) => Number(n).toLocaleString("ko-KR");
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const PERIODS = { day: "일간", week: "주간", month: "월간", all: "전체" };
+const REASONS = { grant: "관리자 지급", revoke: "관리자 회수", attend: "출석", roulette: "룰렛", admin: "관리자 조정" };
+const MEDALS = ["🥇", "🥈", "🥉"];
+const TABS = [["home", "👤", "내 정보"], ["stats", "📊", "통계"], ["rank", "🏆", "랭킹"], ["roulette", "🎡", "룰렛"]];
+let state = null, rankPeriod = null, spinning = false, turns = 0;
+const loaded = {};
+
+async function api(path, options = {}) {
+  const res = await fetch(path, { ...options, headers: { "X-Init-Data": tg?.initData || "" } });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.detail || "요청에 실패했습니다.");
+  return body;
+}
+
+function show(tab) {
+  document.querySelectorAll("section").forEach((s) => (s.hidden = s.dataset.tab !== tab));
+  document.querySelectorAll("nav button").forEach((b) => b.classList.toggle("on", b.dataset.tab === tab));
+  if (tab === "stats" && !loaded.stats) loadStats();
+  if (tab === "rank" && !loaded.rank) loadRanking(rankPeriod);
+  window.scrollTo(0, 0);
+}
+
+function renderMe() {
+  const u = state.user;
+  $("name").textContent = u.name;
+  $("points").textContent = fmt(u.points);
+  $("tickets").textContent = fmt(u.tickets);
+  $("ticketTile").hidden = !state.roulette.enabled;
+  $("periodLabel").textContent = PERIODS[state.period];
+  $("rank").innerHTML = u.rank ? `${fmt(u.rank)}<small>위</small>` : `<small>기록 없음</small>`;
+  $("messages").textContent = fmt(u.messages);
+  $("attend").textContent = fmt(u.attend_total);
+  $("streak").textContent = `일 · 연속 ${u.attend_streak}일`;
+  $("logs").innerHTML = state.logs.length
+    ? state.logs.map((l) => {
+        const unit = l.kind === "points" ? "P" : "장";
+        const icon = l.kind === "points" ? "💰" : "🎟";
+        return `<div class="row"><div class="main"><div class="title">${icon} ${REASONS[l.reason] || l.reason}</div>
+          <div class="meta">${l.ts.slice(5, 16)} · 잔여 ${fmt(l.balance)} ${unit}</div></div>
+          <div class="num ${l.delta > 0 ? "up" : "down"}">${l.delta > 0 ? "+" : ""}${fmt(l.delta)} ${unit}</div></div>`;
+      }).join("")
+    : `<div class="empty">내역이 없습니다.</div>`;
+  renderSpinButton();
+}
+
+function barChart(el, items) {
+  const W = el.clientWidth || 320, H = 150, top = 8, bottom = 20, left = 0;
+  const max = Math.max(1, ...items.map((d) => d.value));
+  const step = (W - left) / items.length;
+  const bw = Math.max(2, Math.min(18, step - 2));
+  const ph = H - top - bottom;
+  const every = Math.ceil(items.length / 6);
+  let svg = `<line class="gridline" x1="0" x2="${W}" y1="${top}" y2="${top}"/><line class="gridline" x1="0" x2="${W}" y1="${top + ph / 2}" y2="${top + ph / 2}"/><line class="gridline" x1="0" x2="${W}" y1="${top + ph}" y2="${top + ph}"/>`;
+  svg += `<text x="${W}" y="${top - 2}" text-anchor="end">${fmt(max)}</text>`;
+  items.forEach((d, i) => {
+    const h = d.value ? Math.max(2, (d.value / max) * ph) : 0;
+    const x = left + i * step + (step - bw) / 2, y = top + ph - h, r = Math.min(4, bw / 2, h);
+    if (h) svg += `<path class="bar" data-i="${i}" d="M${x},${y + h}V${y + r}a${r},${r} 0 0 1 ${r},${-r}h${bw - 2 * r}a${r},${r} 0 0 1 ${r},${r}V${y + h}z"/>`;
+    if (i % every === 0) svg += `<text x="${x + bw / 2}" y="${H - 5}" text-anchor="middle">${d.label}</text>`;
+  });
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}">${svg}</svg><div class="tip"></div>`;
+  const tip = el.querySelector(".tip"), node = el.querySelector("svg");
+  const move = (e) => {
+    const rect = node.getBoundingClientRect();
+    const px = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+    const i = Math.max(0, Math.min(items.length - 1, Math.floor((px / rect.width) * items.length)));
+    el.querySelectorAll(".bar").forEach((b) => b.classList.toggle("dim", +b.dataset.i !== i));
+    tip.textContent = `${items[i].tip} · ${fmt(items[i].value)}${items[i].unit}`;
+    tip.style.display = "block";
+    tip.style.left = Math.max(50, Math.min(rect.width - 50, ((i + 0.5) / items.length) * rect.width)) + "px";
+  };
+  const leave = () => { tip.style.display = "none"; el.querySelectorAll(".bar").forEach((b) => b.classList.remove("dim")); };
+  node.addEventListener("mousemove", move);
+  node.addEventListener("touchstart", move, { passive: true });
+  node.addEventListener("touchmove", move, { passive: true });
+  node.addEventListener("mouseleave", leave);
+  node.addEventListener("touchend", leave);
+}
+
+async function loadStats() {
+  const s = await api("/api/stats");
+  loaded.stats = true;
+  const t = s.totals;
+  const joins = s.daily.reduce((a, d) => a + d.joins, 0), leaves = s.daily.reduce((a, d) => a + d.leaves, 0);
+  const tiles = [
+    ["💬 오늘 채팅", t.messages_today, "회"], ["🙋 오늘 활동", t.active_today, "명"],
+    ["📈 7일 채팅", t.messages_week, "회"], ["👥 7일 활동", t.active_week, "명"],
+    ["🗂 집계 회원", t.members, "명"], ["🚪 30일 입장 / 퇴장", `${fmt(joins)} / ${fmt(leaves)}`, ""],
+  ];
+  $("kpis").innerHTML = tiles.map(([k, v, u]) => `<div class="tile"><div class="k">${k}</div><div class="v">${typeof v === "number" ? fmt(v) : v}<small>${u}</small></div></div>`).join("");
+  const day = (d) => `${+d.slice(5, 7)}.${+d.slice(8)}`;
+  barChart($("chartDaily"), s.daily.map((d) => ({ label: day(d.day), tip: day(d.day), value: d.messages, unit: "회" })));
+  barChart($("chartUsers"), s.daily.map((d) => ({ label: day(d.day), tip: day(d.day), value: d.users, unit: "명" })));
+  barChart($("chartHours"), s.hourly.map((v, h) => ({ label: `${h}시`, tip: `${h}시`, value: v, unit: "회" })));
+}
+
+async function loadRanking(period) {
+  rankPeriod = period;
+  $("periods").innerHTML = Object.entries(PERIODS).map(([k, v]) => `<button data-p="${k}" class="${k === period ? "on" : ""}">${v}</button>`).join("");
+  const r = await api(`/api/ranking?period=${period}`);
+  loaded.rank = true;
+  const me = state.user.id;
+  let html = r.rows.map((x, i) => `<div class="row ${x.id === me ? "me" : ""}">
+    <div class="pos ${i < 3 ? "medal" : ""}">${MEDALS[i] || i + 1}</div>
+    <div class="main"><div class="title">${esc(x.name)}</div></div><div class="num">${fmt(x.count)}</div></div>`).join("");
+  if (r.me.rank && r.me.rank > r.rows.length) html += `<div class="row me"><div class="pos">${r.me.rank}</div><div class="main"><div class="title">${esc(state.user.name)}</div></div><div class="num">${fmt(r.me.count)}</div></div>`;
+  $("ranking").innerHTML = html || `<div class="empty">아직 집계된 채팅이 없습니다.</div>`;
+}
+
+function slotLabel(p) { return p ? fmt(p) : "꽝"; }
+
+function renderWheel() {
+  const slots = state.roulette.slots, n = slots.length, a = (2 * Math.PI) / n;
+  const pt = (ang, r) => `${(Math.sin(ang) * r).toFixed(2)},${(-Math.cos(ang) * r).toFixed(2)}`;
+  $("wheel").innerHTML = slots.map((p, i) => {
+    const mid = (i + 0.5) * (360 / n);
+    return `<path class="${i % 2 ? "b" : "a"}" d="M0,0L${pt(i * a, 98)}A98,98 0 0 1 ${pt((i + 1) * a, 98)}z"/>
+      <text transform="rotate(${mid}) translate(0,-66)" text-anchor="middle" dominant-baseline="middle">${slotLabel(p)}</text>`;
+  }).join("") + `<circle r="98" fill="none" stroke="var(--line)" stroke-width="2"/>`;
+}
+
+function renderSpinButton() {
+  const t = state.user.tickets;
+  $("spin").textContent = t ? `돌리기 · 이용권 ${fmt(t)}장` : "이용권이 없습니다";
+  $("spin").disabled = spinning || !t;
+}
+
+async function spin() {
+  if (spinning) return;
+  spinning = true;
+  renderSpinButton();
+  $("result").innerHTML = "";
+  try {
+    const r = await api("/api/spin", { method: "POST" });
+    const n = state.roulette.slots.length;
+    turns += 6;
+    $("wheel").style.transform = `rotate(${turns * 360 - (r.index + 0.5) * (360 / n)}deg)`;
+    state.user.tickets = r.tickets;
+    await new Promise((ok) => setTimeout(ok, 4300));
+    state.user.points = r.balance;
+    $("result").innerHTML = r.points ? `🎉 <b>+${fmt(r.points)} P</b><div class="sub">보유 ${fmt(r.balance)} P</div>` : `<b>꽝</b><div class="sub">다음 기회에</div>`;
+    tg?.HapticFeedback?.notificationOccurred(r.points ? "success" : "warning");
+    api("/api/me").then((s) => { state = s; renderMe(); });
+  } catch (e) {
+    $("result").innerHTML = `<div class="sub">${esc(e.message)}</div>`;
+  }
+  spinning = false;
+  renderMe();
+}
+
+async function init() {
+  tg?.ready(); tg?.expand();
+  try {
+    state = await api("/api/me");
+  } catch (e) {
+    $("gate").textContent = e.message;
+    return;
+  }
+  rankPeriod = state.period;
+  const tabs = TABS.filter(([k]) => k !== "roulette" || state.roulette.enabled);
+  $("nav").innerHTML = tabs.map(([k, i, t]) => `<button data-tab="${k}"><i>${i}</i>${t}</button>`).join("");
+  $("nav").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) show(b.dataset.tab); });
+  $("periods").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) loadRanking(b.dataset.p); });
+  $("spin").addEventListener("click", spin);
+  if (state.roulette.enabled) renderWheel();
+  renderMe();
+  $("gate").hidden = true; $("app").hidden = false; $("nav").hidden = false;
+  show("home");
+}
+init();
+</script>
+</body>
+</html>

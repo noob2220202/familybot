@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>패밀리봇 관리자</title>
+<style>
+:root {
+  --bg: #f3f4f7; --card: #ffffff; --text: #15171c; --hint: #6f7785; --line: #e3e6ec;
+  --accent: #2f6fed; --on-accent: #ffffff; --soft: #eaf0fe; --up: #16834f; --down: #c93a2e; --danger: #c93a2e;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e1013; --card: #181b20; --text: #eef0f4; --hint: #8a92a0; --line: #2a2e36;
+    --accent: #5b8ff5; --on-accent: #0b0d10; --soft: #1c2740; --up: #3ecf8e; --down: #ff6b5e; --danger: #ff6b5e;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 14.5px/1.5 -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif; }
+[hidden] { display: none !important; }
+h1 { font-size: 22px; margin: 0 0 18px; letter-spacing: -.02em; }
+h2 { font-size: 15px; margin: 0 0 12px; }
+.hint { color: var(--hint); font-size: 13px; }
+input, select, textarea, button { font: inherit; color: inherit; }
+input, select, textarea { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; min-width: 0; }
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+textarea { width: 100%; min-height: 160px; resize: vertical; }
+button { cursor: pointer; border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 9px 14px; font-weight: 600; white-space: nowrap; }
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+button.danger { color: var(--danger); }
+button.ghost { border: 0; background: none; padding: 6px 8px; color: var(--hint); }
+button:disabled { opacity: .5; cursor: default; }
+
+#login { min-height: 100vh; display: grid; place-items: center; padding: 16px; }
+#login form { width: 100%; max-width: 340px; background: var(--card); border-radius: 18px; padding: 28px; display: grid; gap: 12px; }
+#login h1 { margin-bottom: 6px; }
+#loginError { color: var(--danger); font-size: 13px; min-height: 20px; }
+
+#shell { display: grid; grid-template-columns: 210px 1fr; min-height: 100vh; }
+aside { background: var(--card); border-right: 1px solid var(--line); padding: 20px 12px; display: flex; flex-direction: column; gap: 4px; position: sticky; top: 0; height: 100vh; }
+aside .brand { font-weight: 800; font-size: 16px; padding: 4px 12px 16px; letter-spacing: -.02em; }
+aside button { border: 0; background: none; text-align: left; padding: 10px 12px; color: var(--hint); }
+aside button.on { background: var(--soft); color: var(--accent); }
+aside .spacer { flex: 1; }
+main { padding: 28px; min-width: 0; max-width: 1100px; }
+.card { background: var(--card); border-radius: 16px; padding: 18px; margin-bottom: 16px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.tile { background: var(--card); border-radius: 16px; padding: 14px 16px; }
+.tile .k { font-size: 12.5px; color: var(--hint); }
+.tile .v { font-size: 22px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.tile .v small { font-size: 13px; color: var(--hint); margin-left: 3px; font-weight: 600; }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+.cols .card { margin: 0; }
+.bar-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+.bar-row .grow { flex: 1; }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; font-size: 12px; color: var(--hint); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+td { padding: 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+tbody tr.click { cursor: pointer; }
+tbody tr.click:hover { background: var(--soft); }
+.up { color: var(--up); } .down { color: var(--down); }
+.tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--soft); color: var(--accent); }
+.pager { display: flex; gap: 8px; align-items: center; justify-content: flex-end; margin-top: 12px; }
+.field { display: grid; grid-template-columns: 150px 1fr; gap: 12px; align-items: center; margin-bottom: 12px; }
+.field > label { color: var(--hint); font-size: 13px; }
+.switch { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 600; }
+.switch input { appearance: none; width: 44px; height: 26px; border-radius: 999px; background: var(--line); border: 0; padding: 0; position: relative; cursor: pointer; transition: background .15s; }
+.switch input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform .15s; }
+.switch input:checked { background: var(--accent); }
+.switch input:checked::after { transform: translateX(18px); }
+.slot { display: grid; grid-template-columns: 1fr 1fr 70px 36px; gap: 8px; align-items: center; margin-bottom: 8px; }
+.league { display: grid; grid-template-columns: 90px 1fr 36px; gap: 8px; align-items: center; margin-bottom: 8px; }
+.savebar { position: sticky; bottom: 0; background: var(--bg); padding: 12px 0; display: flex; gap: 12px; align-items: center; }
+.chart { position: relative; }
+.chart svg { display: block; width: 100%; height: 170px; overflow: visible; }
+.chart .bar { fill: var(--accent); } .chart .bar.dim { opacity: .35; }
+.chart .gridline { stroke: var(--line); }
+.chart text { fill: var(--hint); font-size: 10.5px; font-variant-numeric: tabular-nums; }
+.tip { position: absolute; top: -6px; transform: translate(-50%, -100%); background: var(--text); color: var(--card); font-size: 12px; font-weight: 600; padding: 5px 9px; border-radius: 8px; white-space: nowrap; pointer-events: none; display: none; }
+dialog { border: 0; border-radius: 18px; background: var(--card); color: var(--text); padding: 24px; width: min(420px, calc(100vw - 32px)); }
+dialog::backdrop { background: rgba(0, 0, 0, .5); }
+#toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); background: var(--text); color: var(--card); padding: 10px 18px; border-radius: 999px; font-weight: 600; font-size: 13.5px; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 10; }
+#toast.on { opacity: 1; }
+@media (max-width: 760px) {
+  #shell { grid-template-columns: 1fr; }
+  aside { position: static; height: auto; flex-direction: row; overflow-x: auto; padding: 8px; border-right: 0; border-bottom: 1px solid var(--line); }
+  aside .brand, aside .spacer { display: none; }
+  main { padding: 16px; }
+  .field { grid-template-columns: 1fr; gap: 4px; }
+}
+</style>
+</head>
+<body>
+<div id="login" hidden>
+  <form id="loginForm">
+    <h1>🔐 관리자 로그인</h1>
+    <input id="lu" placeholder="아이디" autocomplete="username" required>
+    <input id="lp" type="password" placeholder="비밀번호" autocomplete="current-password" required>
+    <div id="loginError"></div>
+    <button class="primary">로그인</button>
+  </form>
+</div>
+
+<div id="shell" hidden>
+  <aside id="nav">
+    <div class="brand">🤖 패밀리봇</div>
+    <button data-view="dashboard">📊 대시보드</button>
+    <button data-view="users">👥 회원</button>
+    <button data-view="logs">🧾 내역</button>
+    <button data-view="settings">⚙️ 설정</button>
+    <button data-view="notice">📢 공지</button>
+    <div class="spacer"></div>
+    <button id="logout">로그아웃</button>
+  </aside>
+  <main>
+    <section data-view="dashboard">
+      <h1>대시보드</h1>
+      <div class="tiles" id="tiles"></div>
+      <div class="cols">
+        <div class="card"><h2>일별 채팅 · 최근 30일</h2><div class="chart" id="cDaily"></div></div>
+        <div class="card"><h2>일별 활동 인원 · 최근 30일</h2><div class="chart" id="cUsers"></div></div>
+        <div class="card"><h2>시간대별 채팅 · 최근 30일 합계</h2><div class="chart" id="cHours"></div></div>
+        <div class="card"><h2>🏆 채팅 랭킹 · <span id="dashPeriod"></span></h2><div class="scroll"><table><tbody id="dashRank"></tbody></table></div></div>
+      </div>
+    </section>
+
+    <section data-view="users" hidden>
+      <h1>회원</h1>
+      <div class="card">
+        <div class="bar-row">
+          <input class="grow" id="uq" placeholder="이름 · @유저네임 · ID 검색">
+          <select id="usort"><option value="points">포인트순</option><option value="tickets">이용권순</option><option value="messages">채팅순</option><option value="recent">최근 활동순</option></select>
+        </div>
+        <div class="scroll"><table>
+          <thead><tr><th>이름</th><th>유저네임</th><th>ID</th><th class="n">포인트</th><th class="n">이용권</th><th class="n">채팅</th><th class="n">출석</th><th>최근 활동</th></tr></thead>
+          <tbody id="urows"></tbody>
+        </table></div>
+        <div class="pager"><span class="hint" id="uinfo"></span><button id="uprev">이전</button><button id="unext">다음</button></div>
+      </div>
+    </section>
+
+    <section data-view="logs" hidden>
+      <h1>내역</h1>
+      <div class="card">
+        <div class="bar-row"><input class="grow" id="lq" placeholder="이름 · @유저네임 · ID 검색"></div>
+        <div class="scroll"><table>
+          <thead><tr><th>시각</th><th>회원</th><th>구분</th><th>사유</th><th class="n">변동</th><th class="n">잔여</th><th>처리자</th></tr></thead>
+          <tbody id="lrows"></tbody>
+        </table></div>
+        <div class="pager"><span class="hint" id="linfo"></span><button id="lprev">이전</button><button id="lnext">다음</button></div>
+      </div>
+    </section>
+
+    <section data-view="settings" hidden>
+      <h1>설정</h1>
+      <div class="card">
+        <h2>🏆 랭킹 · 출석</h2>
+        <div class="field"><label>/랭킹 집계 기간</label><select id="sPeriod"><option value="day">일간</option><option value="week">주간</option><option value="month">월간</option><option value="all">전체</option></select></div>
+        <div class="field"><label>출석 보상 (P)</label><input id="sAttend" type="number" min="0"></div>
+      </div>
+      <div class="card">
+        <h2>🎡 룰렛</h2>
+        <div class="field"><label>사용</label><label class="switch"><input type="checkbox" id="sRoulette"><span id="sRouletteLabel"></span></label></div>
+        <div class="slot hint"><span>당첨 포인트 (0 = 꽝)</span><span>가중치</span><span>확률</span><span></span></div>
+        <div id="slots"></div>
+        <button id="addSlot">+ 칸 추가</button>
+      </div>
+      <div class="card">
+        <h2>📅 경기</h2>
+        <div class="field"><label>캐시 시간 (초)</label><input id="sCache" type="number" min="30" max="3600"></div>
+        <div class="cols" id="leagues"></div>
+        <h2 style="margin-top:18px">리그 검색</h2>
+        <div class="bar-row">
+          <select id="lsSport"></select>
+          <input class="grow" id="lsQuery" placeholder="영문 리그명 3글자 이상 (예: korea, v-league)">
+          <button id="lsGo">검색</button>
+        </div>
+        <div class="scroll"><table><tbody id="lsRows"></tbody></table></div>
+      </div>
+      <div class="card">
+        <h2>⚠️ 초기화</h2>
+        <div class="bar-row">
+          <button class="danger" data-reset="points">전체 포인트 초기화</button>
+          <button class="danger" data-reset="tickets">전체 이용권 초기화</button>
+          <button class="danger" data-reset="chat">채팅 횟수 초기화</button>
+        </div>
+        <div class="hint">즉시 적용되며 되돌릴 수 없습니다.</div>
+      </div>
+      <div class="savebar"><button class="primary" id="save">설정 저장</button><span class="hint">룰렛 · 경기 · 랭킹 · 출석 설정은 저장해야 적용됩니다.</span></div>
+    </section>
+
+    <section data-view="notice" hidden>
+      <h1>공지</h1>
+      <div class="card">
+        <textarea id="nText" placeholder="그룹방에 보낼 내용"></textarea>
+        <div class="hint" style="margin:8px 0 14px">사용 가능: &lt;b&gt;굵게&lt;/b&gt; · &lt;i&gt;기울임&lt;/i&gt; · &lt;u&gt;밑줄&lt;/u&gt; · &lt;blockquote&gt;인용&lt;/blockquote&gt; · &lt;a href="…"&gt;링크&lt;/a&gt;</div>
+        <div class="bar-row"><label class="switch"><input type="checkbox" id="nPin">상단 고정</label><span class="grow"></span><button class="primary" id="nSend">보내기</button></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<dialog id="dlg">
+  <h2 id="dName"></h2>
+  <div class="hint" id="dMeta" style="margin-bottom:16px"></div>
+  <div class="bar-row">
+    <select id="dKind"><option value="points">포인트</option><option value="tickets">이용권</option></select>
+    <input class="grow" id="dAmount" type="number" min="1" placeholder="수량">
+  </div>
+  <div class="bar-row"><button class="primary grow" id="dGive">지급</button><button class="danger grow" id="dTake">회수</button><button id="dClose">닫기</button></div>
+</dialog>
+<div id="toast"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const fmt = (n) => Number(n).toLocaleString("ko-KR");
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const PERIODS = { day: "일간", week: "주간", month: "월간", all: "전체" };
+const REASONS = { grant: "명령어 지급", revoke: "명령어 회수", attend: "출석", roulette: "룰렛", admin: "관리자 조정", reset: "전체 초기화" };
+const KINDS = { points: "포인트", tickets: "이용권", chat: "채팅" };
+const SPORTS = { football: "⚽ 축구", basketball: "🏀 농구", baseball: "⚾ 야구", volleyball: "🏐 배구" };
+const MEDALS = ["🥇", "🥈", "🥉"];
+let cfg = null, upage = 0, lpage = 0, current = null;
+
+function toast(text) {
+  $("toast").textContent = text; $("toast").classList.add("on");
+  clearTimeout(toast.t); toast.t = setTimeout(() => $("toast").classList.remove("on"), 2200);
+}
+
+async function api(path, method = "GET", body) {
+  const res = await fetch(path, { method, headers: body ? { "Content-Type": "application/json" } : {}, body: body ? JSON.stringify(body) : undefined });
+  const data = await res.json().catch(() => ({}));
+  if (res.status === 401 && path !== "/api/login") { showLogin(); throw new Error("로그인이 필요합니다."); }
+  if (!res.ok) throw new Error(typeof data.detail === "string" ? data.detail : "입력값을 확인하세요.");
+  return data;
+}
+const run = (fn) => async (...a) => { try { await fn(...a); } catch (e) { toast(e.message); } };
+
+function showLogin() { $("shell").hidden = true; $("login").hidden = false; }
+
+function barChart(el, items) {
+  const W = el.clientWidth || 420, H = 170, top = 10, bottom = 20, max = Math.max(1, ...items.map((d) => d.value));
+  const step = W / items.length, bw = Math.max(2, Math.min(18, step - 2)), ph = H - top - bottom, every = Math.ceil(items.length / 8);
+  let svg = [0, .5, 1].map((f) => `<line class="gridline" x1="0" x2="${W}" y1="${top + ph * f}" y2="${top + ph * f}"/>`).join("") + `<text x="${W}" y="${top - 3}" text-anchor="end">${fmt(max)}</text>`;
+  items.forEach((d, i) => {
+    const h = d.value ? Math.max(2, (d.value / max) * ph) : 0, x = i * step + (step - bw) / 2, y = top + ph - h, r = Math.min(4, bw / 2, h);
+    if (h) svg += `<path class="bar" data-i="${i}" d="M${x},${y + h}V${y + r}a${r},${r} 0 0 1 ${r},${-r}h${bw - 2 * r}a${r},${r} 0 0 1 ${r},${r}V${y + h}z"/>`;
+    if (i % every === 0) svg += `<text x="${x + bw / 2}" y="${H - 5}" text-anchor="middle">${d.label}</text>`;
+  });
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}">${svg}</svg><div class="tip"></div>`;
+  const tip = el.querySelector(".tip"), node = el.querySelector("svg");
+  node.onmousemove = (e) => {
+    const rect = node.getBoundingClientRect();
+    const i = Math.max(0, Math.min(items.length - 1, Math.floor(((e.clientX - rect.left) / rect.width) * items.length)));
+    el.querySelectorAll(".bar").forEach((b) => b.classList.toggle("dim", +b.dataset.i !== i));
+    tip.textContent = `${items[i].label} · ${fmt(items[i].value)}${items[i].unit}`;
+    tip.style.display = "block";
+    tip.style.left = Math.max(50, Math.min(rect.width - 50, ((i + .5) / items.length) * rect.width)) + "px";
+  };
+  node.onmouseleave = () => { tip.style.display = "none"; el.querySelectorAll(".bar").forEach((b) => b.classList.remove("dim")); };
+}
+
+const loaders = {
+  async dashboard() {
+    const s = await api("/api/dashboard"), t = s.totals;
+    const tiles = [["💬 오늘 채팅", t.messages_today, "회"], ["🙋 오늘 활동", t.active_today, "명"], ["📈 7일 채팅", t.messages_week, "회"], ["👥 집계 회원", t.members, "명"], ["💰 유통 포인트", t.points, "P"], ["🎟 미사용 이용권", t.tickets, "장"]];
+    $("tiles").innerHTML = tiles.map(([k, v, u]) => `<div class="tile"><div class="k">${k}</div><div class="v">${fmt(v)}<small>${u}</small></div></div>`).join("");
+    const day = (d) => `${+d.slice(5, 7)}.${+d.slice(8)}`;
+    barChart($("cDaily"), s.daily.map((d) => ({ label: day(d.day), value: d.messages, unit: "회" })));
+    barChart($("cUsers"), s.daily.map((d) => ({ label: day(d.day), value: d.users, unit: "명" })));
+    barChart($("cHours"), s.hourly.map((v, h) => ({ label: `${h}시`, value: v, unit: "회" })));
+    $("dashPeriod").textContent = PERIODS[s.period];
+    $("dashRank").innerHTML = s.ranking.map((r, i) => `<tr><td style="width:44px">${MEDALS[i] || i + 1}</td><td>${esc(r.name)}</td><td class="n">${fmt(r.count)}</td></tr>`).join("") || `<tr><td class="hint">집계된 채팅이 없습니다.</td></tr>`;
+  },
+  async users() {
+    const r = await api(`/api/users?q=${encodeURIComponent($("uq").value)}&sort=${$("usort").value}&page=${upage}`);
+    $("urows").innerHTML = r.rows.map((u) => `<tr class="click" data-id="${u.user_id}"><td><b>${esc(u.name)}</b></td><td class="hint">${u.username ? "@" + esc(u.username) : "–"}</td><td class="hint">${u.user_id}</td>
+      <td class="n"><b>${fmt(u.points)}</b></td><td class="n">${fmt(u.tickets)}</td><td class="n">${fmt(u.msg_total)}</td><td class="n">${fmt(u.attend_total)}일</td><td class="hint">${u.last_seen.slice(5, 16)}</td></tr>`).join("") || `<tr><td colspan="8" class="hint">회원이 없습니다.</td></tr>`;
+    loaders.users.rows = r.rows;
+    pager("u", upage, r);
+  },
+  async logs() {
+    const r = await api(`/api/logs?q=${encodeURIComponent($("lq").value)}&page=${lpage}`);
+    $("lrows").innerHTML = r.rows.map((l) => {
+      const unit = l.kind === "points" ? "P" : l.kind === "tickets" ? "장" : "";
+      const delta = l.reason === "reset" ? "–" : `<span class="${l.delta > 0 ? "up" : "down"}">${l.delta > 0 ? "+" : ""}${fmt(l.delta)} ${unit}</span>`;
+      return `<tr><td class="hint">${l.ts.slice(5, 16)}</td><td>${l.user_id ? esc(l.name || l.user_id) : "전체"}</td><td><span class="tag">${KINDS[l.kind] || l.kind}</span></td><td>${REASONS[l.reason] || esc(l.reason)}</td>
+        <td class="n"><b>${delta}</b></td><td class="n">${l.reason === "reset" ? "0" : fmt(l.balance)}</td><td class="hint">${esc(l.actor)}</td></tr>`;
+    }).join("") || `<tr><td colspan="7" class="hint">내역이 없습니다.</td></tr>`;
+    pager("l", lpage, r);
+  },
+  async settings() { cfg = await api("/api/settings"); renderSettings(); },
+  async notice() {},
+};
+
+function pager(p, page, r) {
+  const pages = Math.max(1, Math.ceil(r.total / r.page_size));
+  $(p + "info").textContent = `${fmt(r.total)}건 · ${page + 1} / ${pages}`;
+  $(p + "prev").disabled = page === 0; $(p + "next").disabled = page >= pages - 1;
+}
+
+function renderSettings() {
+  $("sPeriod").value = cfg.ranking_period; $("sAttend").value = cfg.attend_points; $("sCache").value = cfg.sports_cache_sec;
+  $("sRoulette").checked = cfg.roulette_enabled; $("sRouletteLabel").textContent = cfg.roulette_enabled ? "켜짐 · 미니앱에 표시" : "꺼짐 · 미니앱에서 숨김";
+  const sum = cfg.roulette_slots.reduce((a, s) => a + (+s.weight || 0), 0);
+  $("slots").innerHTML = cfg.roulette_slots.map((s, i) => `<div class="slot"><input type="number" min="0" data-slot="${i}" data-f="points" value="${s.points}"><input type="number" min="0" data-slot="${i}" data-f="weight" value="${s.weight}">
+    <span class="hint">${sum ? ((s.weight / sum) * 100).toFixed(1) : "0"}%</span><button class="ghost" data-del-slot="${i}">✕</button></div>`).join("");
+  $("leagues").innerHTML = Object.entries(SPORTS).map(([k, label]) => `<div><h2>${label}</h2>${(cfg.leagues[k] || []).map((l, i) => `<div class="league"><input type="number" data-lg="${k}" data-i="${i}" data-f="id" value="${l.id}"><input data-lg="${k}" data-i="${i}" data-f="name" value="${esc(l.name)}"><button class="ghost" data-del-lg="${k}" data-i="${i}">✕</button></div>`).join("") || `<div class="hint">등록된 리그가 없습니다. 아래에서 검색해 추가하세요.</div>`}</div>`).join("");
+  $("lsSport").innerHTML = $("lsSport").innerHTML || Object.entries(SPORTS).map(([k, v]) => `<option value="${k}">${v}</option>`).join("");
+}
+
+function show(view) {
+  document.querySelectorAll("main section").forEach((s) => (s.hidden = s.dataset.view !== view));
+  document.querySelectorAll("#nav [data-view]").forEach((b) => b.classList.toggle("on", b.dataset.view === view));
+  run(loaders[view])();
+}
+
+function openUser(u) {
+  current = u;
+  $("dName").textContent = u.name;
+  $("dMeta").textContent = `${u.username ? "@" + u.username + " · " : ""}ID ${u.user_id} · ${fmt(u.points)} P · 이용권 ${fmt(u.tickets)}장`;
+  $("dAmount").value = "";
+  $("dlg").showModal();
+}
+
+const adjust = (sign) => run(async () => {
+  const amount = parseInt($("dAmount").value, 10);
+  if (!(amount > 0)) return toast("수량을 입력하세요.");
+  const kind = $("dKind").value;
+  const r = await api(`/api/users/${current.user_id}/adjust`, "POST", { kind, delta: sign * amount });
+  toast(`${KINDS[kind]} ${r.applied > 0 ? "+" : ""}${fmt(r.applied)} · 잔여 ${fmt(r.balance)}`);
+  $("dlg").close();
+  await loaders.users();
+});
+
+$("loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  try {
+    await api("/api/login", "POST", { username: $("lu").value, password: $("lp").value });
+    $("lp").value = ""; $("loginError").textContent = "";
+    $("login").hidden = true; $("shell").hidden = false; show("dashboard");
+  } catch (err) { $("loginError").textContent = err.message; }
+});
+$("logout").onclick = run(async () => { await api("/api/logout", "POST"); showLogin(); });
+$("nav").addEventListener("click", (e) => { const b = e.target.closest("[data-view]"); if (b) show(b.dataset.view); });
+
+const settingsView = document.querySelector('section[data-view="settings"]');
+let timer;
+const debounce = (fn) => () => { clearTimeout(timer); timer = setTimeout(fn, 250); };
+$("uq").oninput = debounce(() => { upage = 0; run(loaders.users)(); });
+$("usort").onchange = () => { upage = 0; run(loaders.users)(); };
+$("uprev").onclick = () => { upage--; run(loaders.users)(); };
+$("unext").onclick = () => { upage++; run(loaders.users)(); };
+$("lq").oninput = debounce(() => { lpage = 0; run(loaders.logs)(); });
+$("lprev").onclick = () => { lpage--; run(loaders.logs)(); };
+$("lnext").onclick = () => { lpage++; run(loaders.logs)(); };
+$("urows").addEventListener("click", (e) => { const tr = e.target.closest("tr[data-id]"); if (tr) openUser(loaders.users.rows.find((u) => u.user_id == tr.dataset.id)); });
+$("dGive").onclick = adjust(1); $("dTake").onclick = adjust(-1); $("dClose").onclick = () => $("dlg").close();
+
+settingsView.addEventListener("input", (e) => {
+  const t = e.target;
+  if (t.dataset.slot !== undefined) cfg.roulette_slots[t.dataset.slot][t.dataset.f] = parseInt(t.value, 10) || 0;
+  if (t.dataset.lg) cfg.leagues[t.dataset.lg][t.dataset.i][t.dataset.f] = t.dataset.f === "id" ? parseInt(t.value, 10) || 0 : t.value;
+  if (t.id === "sRoulette") { cfg.roulette_enabled = t.checked; renderSettings(); }
+});
+settingsView.addEventListener("change", (e) => { if (e.target.dataset.slot !== undefined) renderSettings(); });
+settingsView.addEventListener("click", run(async (e) => {
+  const t = e.target.closest("button"); if (!t) return;
+  if (t.dataset.delSlot !== undefined) { cfg.roulette_slots.splice(t.dataset.delSlot, 1); renderSettings(); }
+  if (t.dataset.delLg) { cfg.leagues[t.dataset.delLg].splice(t.dataset.i, 1); renderSettings(); }
+  if (t.dataset.add) { const [sport, id, name] = JSON.parse(t.dataset.add); (cfg.leagues[sport] ||= []).push({ id, name }); renderSettings(); toast("추가했습니다. 저장해야 적용됩니다."); }
+  if (t.dataset.reset) {
+    const label = t.textContent.trim();
+    if (!confirm(`${label}를 실행할까요? 되돌릴 수 없습니다.`)) return;
+    const r = await api(`/api/reset/${t.dataset.reset}`, "POST");
+    toast(`${label} 완료 · ${fmt(r.affected)}명`);
+  }
+}));
+$("addSlot").onclick = () => { cfg.roulette_slots.push({ points: 0, weight: 1 }); renderSettings(); };
+$("lsGo").onclick = run(async () => {
+  const sport = $("lsSport").value;
+  const rows = await api(`/api/leagues/search?sport=${sport}&q=${encodeURIComponent($("lsQuery").value)}`);
+  $("lsRows").innerHTML = rows.map((l) => `<tr><td class="hint">${l.id}</td><td><b>${esc(l.name)}</b></td><td class="hint">${esc(l.country)}</td><td class="n"><button data-add="${esc(JSON.stringify([sport, l.id, l.name]))}">추가</button></td></tr>`).join("") || `<tr><td class="hint">검색 결과가 없습니다.</td></tr>`;
+});
+$("save").onclick = run(async () => {
+  cfg.ranking_period = $("sPeriod").value; cfg.attend_points = parseInt($("sAttend").value, 10) || 0; cfg.sports_cache_sec = parseInt($("sCache").value, 10) || 180;
+  cfg = await api("/api/settings", "PUT", cfg); renderSettings(); toast("저장했습니다.");
+});
+$("nSend").onclick = run(async () => {
+  const text = $("nText").value.trim();
+  if (!text) return toast("내용을 입력하세요.");
+  await api("/api/notice", "POST", { text, pin: $("nPin").checked });
+  $("nText").value = ""; toast("그룹방에 보냈습니다.");
+});
+
+(async () => {
+  const s = await api("/api/session");
+  if (s.authed) { $("shell").hidden = false; show("dashboard"); } else showLogin();
+})();
+</script>
+</body>
+</html>
