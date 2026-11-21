@@ -5,13 +5,23 @@ import time
 from urllib.parse import parse_qsl
 
 import uvicorn
-from fastapi import Depends, FastAPI, Header, HTTPException
+from fastapi import Depends, Header, HTTPException, Request
 from fastapi.responses import FileResponse
 
 from . import config, db, web
 
-app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
-web.mount_fonts(app)
+HEADERS = {"X-Content-Type-Options": "nosniff"}
+
+app = web.create_app(HEADERS)
+
+
+@app.middleware("http")
+async def secure(request: Request, call_next):
+    response = await call_next(request)
+    response.headers.update(HEADERS)
+    if request.url.path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 def verify_init_data(init_data: str) -> dict | None:
@@ -20,13 +30,13 @@ def verify_init_data(init_data: str) -> dict | None:
     check = "\n".join(f"{k}={v}" for k, v in sorted(pairs.items()))
     secret = hmac.new(b"WebAppData", config.BOT_TOKEN.encode(), hashlib.sha256).digest()
     expected = hmac.new(secret, check.encode(), hashlib.sha256).hexdigest()
-    if not hmac.compare_digest(expected, received):
-        return None
-    if time.time() - int(pairs.get("auth_date") or 0) > 86400:
+    if not hmac.compare_digest(expected.encode(), received.encode()):
         return None
     try:
-        return json.loads(pairs["user"])
-    except (KeyError, ValueError):
+        user = json.loads(pairs["user"])
+        fresh = time.time() - int(pairs["auth_date"]) <= 86400
+        return user if fresh and isinstance(user["id"], int) and abs(user["id"]) < 2**63 else None
+    except (KeyError, ValueError, TypeError):
         return None
 
 
@@ -35,7 +45,7 @@ def member(x_init_data: str = Header("")):
     if not tg:
         raise HTTPException(401, "텔레그램에서 열어 주세요.")
     user = db.get_user(tg["id"])
-    if not user:
+    if not user or db.gone(tg["id"]):
         raise HTTPException(403, "그룹방에서 채팅한 회원만 이용할 수 있습니다.")
     return user
 
@@ -114,4 +124,6 @@ def index():
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host=config.HOST, port=config.MINIAPP_PORT, proxy_headers=True, forwarded_allow_ips="*")
+    if not config.BOT_TOKEN:
+        raise SystemExit("BOT_TOKEN이 설정되지 않았습니다.")
+    uvicorn.run(app, host=config.HOST, port=config.MINIAPP_PORT)

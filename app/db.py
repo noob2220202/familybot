@@ -74,6 +74,7 @@ DEFAULTS = {
         {"points": 5000, "weight": 1},
     ],
     "sports_cache_sec": 180,
+    "session_epoch": 0,
     "leagues": {
         "football": [
             {"id": 39, "name": "프리미어리그"},
@@ -86,7 +87,7 @@ DEFAULTS = {
         ],
         "basketball": [{"id": 12, "name": "NBA"}, {"id": 91, "name": "KBL"}],
         "baseball": [{"id": 1, "name": "MLB"}, {"id": 5, "name": "KBO"}, {"id": 2, "name": "NPB"}],
-        "volleyball": [],
+        "volleyball": [{"id": 151, "name": "V리그 남자"}, {"id": 152, "name": "V리그 여자"}],
     },
 }
 
@@ -164,9 +165,9 @@ def save_settings(values: dict) -> None:
                 )
 
 
-def touch_user(user_id: int, username: str | None, name: str, count: bool = False) -> None:
-    n = now()
-    ts = n.strftime("%Y-%m-%d %H:%M:%S")
+def touch_user(user_id: int, username: str | None, name: str, count: bool = False, at: datetime | None = None) -> None:
+    n = at.astimezone(config.TZ) if at else now()
+    ts = now().strftime("%Y-%m-%d %H:%M:%S")
     with tx() as c:
         c.execute(
             "INSERT INTO users(user_id, username, name, joined_at, last_seen) VALUES(?, ?, ?, ?, ?) "
@@ -189,8 +190,10 @@ def get_user(user_id: int):
 def find_user(token: str):
     token = token.strip()
     if token.startswith("@"):
-        return conn().execute("SELECT * FROM users WHERE username=? COLLATE NOCASE", (token[1:],)).fetchone()
-    if token.isdigit():
+        return conn().execute(
+            "SELECT * FROM users WHERE username=? COLLATE NOCASE ORDER BY last_seen DESC LIMIT 1", (token[1:],)
+        ).fetchone()
+    if token.isdecimal() and len(token) < 19:
         return get_user(int(token))
     return None
 
@@ -249,11 +252,22 @@ def attend(user_id: int) -> dict | None:
         return {"reward": reward, "streak": streak, "total": total, "balance": balance}
 
 
+GONE = "SELECT user_id FROM member_events GROUP BY user_id HAVING MAX(id)=MAX(CASE WHEN event='leave' THEN id END)"
+
+
+def gone(user_id: int) -> bool:
+    r = conn().execute("SELECT event FROM member_events WHERE user_id=? ORDER BY id DESC LIMIT 1", (user_id,)).fetchone()
+    return bool(r) and r["event"] == "leave"
+
+
 def _counts(period: str) -> tuple[str, tuple]:
     start = period_start(period)
     if start is None:
-        return "SELECT user_id, msg_total AS c FROM users WHERE msg_total>0", ()
-    return "SELECT user_id, SUM(cnt) AS c FROM activity WHERE day>=? GROUP BY user_id", (start,)
+        return f"SELECT user_id, msg_total AS c FROM users WHERE msg_total>0 AND user_id NOT IN ({GONE})", ()
+    return (
+        f"SELECT user_id, SUM(cnt) AS c FROM activity WHERE day>=? AND user_id NOT IN ({GONE}) GROUP BY user_id",
+        (start,),
+    )
 
 
 def ranking(period: str, offset: int = 0, limit: int = 10) -> tuple[list, int]:
@@ -275,7 +289,9 @@ def rank_of(user_id: int, period: str) -> tuple[int | None, int, int]:
     mine = c.execute(f"SELECT c FROM ({sub}) WHERE user_id=?", (*args, user_id)).fetchone()
     if not mine:
         return None, 0, total
-    above = c.execute(f"SELECT COUNT(*) FROM ({sub}) WHERE c>?", (*args, mine["c"])).fetchone()[0]
+    above = c.execute(
+        f"SELECT COUNT(*) FROM ({sub}) WHERE c>? OR (c=? AND user_id<?)", (*args, mine["c"], mine["c"], user_id)
+    ).fetchone()[0]
     return above + 1, mine["c"], total
 
 
