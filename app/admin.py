@@ -9,9 +9,10 @@ from fastapi import Depends, FastAPI, HTTPException, Request, Response
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
-from . import config, db, sports
+from . import config, db, sports, web
 
 app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
+web.mount_fonts(app)
 
 COOKIE = "fb_admin"
 SESSION_TTL = 7 * 86400
@@ -148,6 +149,7 @@ class League(BaseModel):
 
 
 class Settings(BaseModel):
+    app_name: str = Field(default=db.DEFAULTS["app_name"], min_length=1, max_length=24)
     ranking_period: str
     attend_points: int = Field(ge=0, le=10**9)
     roulette_enabled: bool

@@ -317,22 +317,15 @@ async def my_info(msg: Message):
     u = db.get_user(uid)
     s = db.settings()
     period = s["ranking_period"]
-    rank, count = db.rank_of(uid, period)
+    rank, count, _ = db.rank_of(uid, period)
     chat = f"💬 채팅 <b>{num(u['msg_total'])}회</b>"
     if rank:
         chat += f" · {db.PERIODS[period]} <b>{rank}위</b> ({num(count)}회)"
     lines = [f"💰 포인트 <b>{num(u['points'])} P</b>"]
     if s["roulette_enabled"]:
         lines.append(f"🎟 룰렛 이용권 <b>{num(u['tickets'])}장</b>")
-    lines += [chat, f"📆 출석 <b>{num(u['attend_total'])}일</b> · 연속 <b>{attend_streak(u)}일</b>"]
+    lines += [chat, f"📆 출석 <b>{num(u['attend_total'])}일</b> · 연속 <b>{db.streak(u)}일</b>"]
     await msg.reply(f"👤 <b>{escape(u['name'])}</b>\n" + quote(*lines), reply_markup=app_button())
-
-
-def attend_streak(u) -> int:
-    if not u["attend_last"]:
-        return 0
-    gap = (db.now().date() - db.date.fromisoformat(u["attend_last"])).days
-    return u["attend_streak"] if gap <= 1 else 0
 
 
 @group.message(Command("출석"))

@@ -40,6 +40,11 @@ CREATE TABLE IF NOT EXISTS logs (
     actor TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_logs_user ON logs(user_id, id);
+CREATE TABLE IF NOT EXISTS attendance (
+    user_id INTEGER NOT NULL,
+    day TEXT NOT NULL,
+    PRIMARY KEY (user_id, day)
+) WITHOUT ROWID;
 CREATE TABLE IF NOT EXISTS member_events (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     day TEXT NOT NULL,
@@ -56,6 +61,7 @@ PERIODS = {"day": "일간", "week": "주간", "month": "월간", "all": "전체"
 KINDS = {"points", "tickets"}
 
 DEFAULTS = {
+    "app_name": "FAMILY",
     "ranking_period": "week",
     "attend_points": 100,
     "roulette_enabled": True,
@@ -236,6 +242,7 @@ def attend(user_id: int) -> dict | None:
             "UPDATE users SET attend_last=?, attend_streak=?, attend_total=attend_total+1 WHERE user_id=?",
             (d.isoformat(), streak, user_id),
         )
+        c.execute("INSERT OR IGNORE INTO attendance(user_id, day) VALUES(?, ?)", (user_id, d.isoformat()))
         reward = int(setting("attend_points"))
         _, balance = _apply(c, user_id, "points", reward, "attend", "출석")
         total = c.execute("SELECT attend_total FROM users WHERE user_id=?", (user_id,)).fetchone()[0]
@@ -261,14 +268,54 @@ def ranking(period: str, offset: int = 0, limit: int = 10) -> tuple[list, int]:
     return rows, total
 
 
-def rank_of(user_id: int, period: str) -> tuple[int | None, int]:
+def rank_of(user_id: int, period: str) -> tuple[int | None, int, int]:
     sub, args = _counts(period)
     c = conn()
+    total = c.execute(f"SELECT COUNT(*) FROM ({sub})", args).fetchone()[0]
     mine = c.execute(f"SELECT c FROM ({sub}) WHERE user_id=?", (*args, user_id)).fetchone()
     if not mine:
-        return None, 0
+        return None, 0, total
     above = c.execute(f"SELECT COUNT(*) FROM ({sub}) WHERE c>?", (*args, mine["c"])).fetchone()[0]
-    return above + 1, mine["c"]
+    return above + 1, mine["c"], total
+
+
+def streak(user) -> int:
+    if not user["attend_last"]:
+        return 0
+    gap = (now().date() - date.fromisoformat(user["attend_last"])).days
+    return user["attend_streak"] if gap <= 1 else 0
+
+
+def user_activity(user_id: int, days: int = 14) -> list[dict]:
+    d = now().date()
+    start = d - timedelta(days=days - 1)
+    counts = {
+        r["day"]: r["n"]
+        for r in conn().execute(
+            "SELECT day, SUM(cnt) AS n FROM activity WHERE user_id=? AND day>=? GROUP BY day",
+            (user_id, start.isoformat()),
+        )
+    }
+    out = []
+    for i in range(days):
+        day = (start + timedelta(days=i)).isoformat()
+        out.append({"day": day, "count": counts.get(day, 0)})
+    return out
+
+
+def attend_days(user_id: int) -> list[str]:
+    start = now().date().replace(day=1).isoformat()
+    rows = conn().execute("SELECT day FROM attendance WHERE user_id=? AND day>=? ORDER BY day", (user_id, start))
+    return [r["day"] for r in rows]
+
+
+def recent_wins(limit: int = 10) -> list[dict]:
+    rows = conn().execute(
+        "SELECT u.name, l.delta AS points, l.ts FROM logs l JOIN users u USING(user_id) "
+        "WHERE l.reason='roulette' AND l.kind='points' AND l.delta>0 ORDER BY l.id DESC LIMIT ?",
+        (limit,),
+    )
+    return [dict(r) for r in rows]
 
 
 def spin(user_id: int) -> dict | None:
