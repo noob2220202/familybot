@@ -1,405 +1,874 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" data-theme="dark">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
-<title>패밀리봇 관리자</title>
+<title>관리자</title>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("fb-theme")||(matchMedia("(prefers-color-scheme:light)").matches?"light":"dark")}catch(e){}</script>
+<link rel="stylesheet" href="/fonts/pretendard.css">
 <style>
-:root {
-  --bg: #f3f4f7; --card: #ffffff; --text: #15171c; --hint: #6f7785; --line: #e3e6ec;
-  --accent: #2f6fed; --on-accent: #ffffff; --soft: #eaf0fe; --up: #16834f; --down: #c93a2e; --danger: #c93a2e;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0e1013; --card: #181b20; --text: #eef0f4; --hint: #8a92a0; --line: #2a2e36;
-    --accent: #5b8ff5; --on-accent: #0b0d10; --soft: #1c2740; --up: #3ecf8e; --down: #ff6b5e; --danger: #ff6b5e;
-  }
-}
-* { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--text); font: 14.5px/1.5 -apple-system, BlinkMacSystemFont, "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", sans-serif; }
-[hidden] { display: none !important; }
-h1 { font-size: 22px; margin: 0 0 18px; letter-spacing: -.02em; }
-h2 { font-size: 15px; margin: 0 0 12px; }
-.hint { color: var(--hint); font-size: 13px; }
-input, select, textarea, button { font: inherit; color: inherit; }
-input, select, textarea { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; min-width: 0; }
-input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
-textarea { width: 100%; min-height: 160px; resize: vertical; }
-button { cursor: pointer; border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 9px 14px; font-weight: 600; white-space: nowrap; }
-button.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
-button.danger { color: var(--danger); }
-button.ghost { border: 0; background: none; padding: 6px 8px; color: var(--hint); }
-button:disabled { opacity: .5; cursor: default; }
+:root{color-scheme:dark;--bg:#0D0C0A;--bar:#110F0D;--surface:#151310;--elev:#1E1B16;--input:#100E0C;--line:rgba(238,226,198,.09);--line2:rgba(238,226,198,.18);--text:#F3EDE0;--text2:#ABA291;--text3:#8A8272;--gold:#C9A96A;--gold-ink:#D8BD84;--wash:rgba(201,169,106,.1);--edge:rgba(201,169,106,.36);--pos:#93C6A4;--neg:#E3927F;--neg-edge:rgba(227,146,127,.45);--neg-wash:rgba(227,146,127,.1);--panel:linear-gradient(180deg,rgba(255,240,205,.035),rgba(255,240,205,0) 48%) var(--surface);--sh:inset 0 1px 0 rgba(255,240,205,.05),0 1px 2px rgba(0,0,0,.35);--float:0 24px 48px -20px rgba(0,0,0,.9),0 2px 10px rgba(0,0,0,.5);--foil:linear-gradient(180deg,#F5E8C4,#D8BC7E 46%,#B08E4E);--metal:linear-gradient(135deg,#F3E5BE,#D3B678 30%,#A7864A 64%,#E2CA92);--on-gold:#17120A;--p2:#BDB7AA;--p3:#B08257;--glow:rgba(201,169,106,.06);--shim:rgba(255,240,205,.06);--ease:cubic-bezier(.2,.7,.2,1)}
+:root[data-theme=light]{color-scheme:light;--bg:#F2EDE3;--bar:#FBF8F2;--surface:#FBF8F2;--elev:#FFFFFF;--input:#FFFFFF;--line:rgba(52,40,18,.1);--line2:rgba(52,40,18,.2);--text:#1B1813;--text2:#655D4F;--text3:#776E61;--gold:#A07C36;--gold-ink:#7E5F1E;--wash:rgba(168,132,62,.1);--edge:rgba(168,132,62,.48);--pos:#2B7A52;--neg:#B5483A;--neg-edge:rgba(181,72,58,.45);--neg-wash:rgba(181,72,58,.07);--panel:var(--surface);--sh:inset 0 1px 0 rgba(255,255,255,.9),0 1px 2px rgba(70,52,20,.05),0 12px 24px -20px rgba(70,52,20,.28);--float:0 24px 48px -20px rgba(60,44,14,.4),0 2px 8px rgba(60,44,14,.1);--foil:linear-gradient(180deg,#A07B30,#785A1C);--p2:#8F897D;--p3:#9A6C40;--glow:rgba(255,255,255,.7);--shim:rgba(255,255,255,.75)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg);-webkit-text-size-adjust:100%}
+body{min-height:100vh;color:var(--text);font:500 14.5px/1.5 Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Segoe UI",Roboto,"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;z-index:-1;height:440px;background:radial-gradient(70% 100% at 62% 0,var(--glow),transparent 70%);pointer-events:none}
+button,input,textarea{font:inherit;color:inherit}
+button{border:0;background:none;cursor:pointer}
+b,i,em{font-style:normal;font-weight:inherit}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.ic{flex:none;width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.foil{padding-right:.04em;background:var(--foil);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.defs{position:absolute;width:0;height:0}
 
-#login { min-height: 100vh; display: grid; place-items: center; padding: 16px; }
-#login form { width: 100%; max-width: 340px; background: var(--card); border-radius: 18px; padding: 28px; display: grid; gap: 12px; }
-#login h1 { margin-bottom: 6px; }
-#loginError { color: var(--danger); font-size: 13px; min-height: 20px; }
+.brand{display:flex;align-items:center;gap:9px;min-width:0;font-size:13.5px;font-weight:700;letter-spacing:.28em;white-space:nowrap}
+.brand svg{flex:none;width:9px;height:11px;fill:#D3B678}
+.brand span{overflow:hidden;text-overflow:ellipsis}
+.brand em{flex:none;padding:2px 7px;border-radius:6px;box-shadow:inset 0 0 0 1px var(--line2);font-size:10px;font-weight:600;letter-spacing:.16em;color:var(--text3)}
 
-#shell { display: grid; grid-template-columns: 210px 1fr; min-height: 100vh; }
-aside { background: var(--card); border-right: 1px solid var(--line); padding: 20px 12px; display: flex; flex-direction: column; gap: 4px; position: sticky; top: 0; height: 100vh; }
-aside .brand { font-weight: 800; font-size: 16px; padding: 4px 12px 16px; letter-spacing: -.02em; }
-aside button { border: 0; background: none; text-align: left; padding: 10px 12px; color: var(--hint); }
-aside button.on { background: var(--soft); color: var(--accent); }
-aside .spacer { flex: 1; }
-main { padding: 28px; min-width: 0; max-width: 1100px; }
-.card { background: var(--card); border-radius: 16px; padding: 18px; margin-bottom: 16px; }
-.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
-.tile { background: var(--card); border-radius: 16px; padding: 14px 16px; }
-.tile .k { font-size: 12.5px; color: var(--hint); }
-.tile .v { font-size: 22px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
-.tile .v small { font-size: 13px; color: var(--hint); margin-left: 3px; font-weight: 600; }
-.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
-.cols .card { margin: 0; }
-.bar-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
-.bar-row .grow { flex: 1; }
-.scroll { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; }
-th { text-align: left; font-size: 12px; color: var(--hint); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
-td { padding: 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
-tr:last-child td { border-bottom: 0; }
-td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
-tbody tr.click { cursor: pointer; }
-tbody tr.click:hover { background: var(--soft); }
-.up { color: var(--up); } .down { color: var(--down); }
-.tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--soft); color: var(--accent); }
-.pager { display: flex; gap: 8px; align-items: center; justify-content: flex-end; margin-top: 12px; }
-.field { display: grid; grid-template-columns: 150px 1fr; gap: 12px; align-items: center; margin-bottom: 12px; }
-.field > label { color: var(--hint); font-size: 13px; }
-.switch { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; font-weight: 600; }
-.switch input { appearance: none; width: 44px; height: 26px; border-radius: 999px; background: var(--line); border: 0; padding: 0; position: relative; cursor: pointer; transition: background .15s; }
-.switch input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform .15s; }
-.switch input:checked { background: var(--accent); }
-.switch input:checked::after { transform: translateX(18px); }
-.slot { display: grid; grid-template-columns: 1fr 1fr 70px 36px; gap: 8px; align-items: center; margin-bottom: 8px; }
-.league { display: grid; grid-template-columns: 90px 1fr 36px; gap: 8px; align-items: center; margin-bottom: 8px; }
-.savebar { position: sticky; bottom: 0; background: var(--bg); padding: 12px 0; display: flex; gap: 12px; align-items: center; }
-.chart { position: relative; }
-.chart svg { display: block; width: 100%; height: 170px; overflow: visible; }
-.chart .bar { fill: var(--accent); } .chart .bar.dim { opacity: .35; }
-.chart .gridline { stroke: var(--line); }
-.chart text { fill: var(--hint); font-size: 10.5px; font-variant-numeric: tabular-nums; }
-.tip { position: absolute; top: -6px; transform: translate(-50%, -100%); background: var(--text); color: var(--card); font-size: 12px; font-weight: 600; padding: 5px 9px; border-radius: 8px; white-space: nowrap; pointer-events: none; display: none; }
-dialog { border: 0; border-radius: 18px; background: var(--card); color: var(--text); padding: 24px; width: min(420px, calc(100vw - 32px)); }
-dialog::backdrop { background: rgba(0, 0, 0, .5); }
-#toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); background: var(--text); color: var(--card); padding: 10px 18px; border-radius: 999px; font-weight: 600; font-size: 13.5px; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 10; }
-#toast.on { opacity: 1; }
-@media (max-width: 760px) {
-  #shell { grid-template-columns: 1fr; }
-  aside { position: static; height: auto; flex-direction: row; overflow-x: auto; padding: 8px; border-right: 0; border-bottom: 1px solid var(--line); }
-  aside .brand, aside .spacer { display: none; }
-  main { padding: 16px; }
-  .field { grid-template-columns: 1fr; gap: 4px; }
+input,textarea{width:100%;height:44px;padding:0 14px;border:1px solid var(--line2);border-radius:12px;background:var(--input);outline:0;transition:border-color .2s,box-shadow .2s}
+input:focus,textarea:focus{border-color:var(--edge);box-shadow:0 0 0 3px var(--wash)}
+input::placeholder,textarea::placeholder{color:var(--text3)}
+textarea{display:block;height:auto;min-height:240px;padding:14px;line-height:1.65;resize:vertical}
+.fld{display:block}
+.fld>span{display:block;margin-bottom:7px;font-size:12.5px;font-weight:600;color:var(--text2)}
+.inp{position:relative}
+.inp input{padding-right:44px}
+.inp em{position:absolute;top:50%;right:14px;font-size:13px;font-weight:600;color:var(--text3);transform:translateY(-50%);pointer-events:none}
+.inp>.ic{position:absolute;top:50%;left:14px;color:var(--text3);transform:translateY(-50%);pointer-events:none}
+.inp>.ic+input{padding-left:42px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 18px;border-radius:12px;font-size:14px;font-weight:600;white-space:nowrap;transition:transform .15s,background-color .2s,box-shadow .2s,opacity .2s}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.42;cursor:default;transform:none}
+.btn.gold{background:linear-gradient(#F2E3BA,#D5B97E 52%,#BE9D60);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(0,0,0,.2),0 10px 22px -12px rgba(201,169,106,.65);color:var(--on-gold)}
+.btn.line{box-shadow:inset 0 0 0 1px var(--line2)}
+.btn.line:not(:disabled):hover{background:var(--wash);box-shadow:inset 0 0 0 1px var(--edge)}
+.btn.danger{box-shadow:inset 0 0 0 1px var(--neg-edge);color:var(--neg)}
+.btn.danger:not(:disabled):hover{background:var(--neg-wash)}
+.btn.danger.solid{background:var(--neg);box-shadow:none;color:#170906}
+.btn.sm{height:36px;padding:0 14px;border-radius:10px;font-size:13px}
+.btn .ic{width:16px;height:16px}
+.ib{display:grid;flex:none;place-items:center;width:38px;height:38px;border-radius:11px;color:var(--text2);transition:background-color .2s,color .2s}
+.ib:hover{background:var(--wash);color:var(--text)}
+.ib.del:hover{background:var(--neg-wash);color:var(--neg)}
+
+.login{display:grid;place-items:center;min-height:100vh;padding:24px 16px}
+.lcard{width:min(400px,100%);padding:34px 30px 30px;border:1px solid var(--line);border-radius:26px;background:var(--panel);box-shadow:var(--sh),var(--float)}
+.lcard .brand{margin-bottom:34px}
+.lcard h1{font-size:24px}
+.lcard>p{margin:6px 0 26px;font-size:13.5px;color:var(--text2)}
+.lcard .fld+.fld{margin-top:14px}
+.err{min-height:20px;margin:14px 0 6px;font-size:13px;font-weight:600;color:var(--neg)}
+.lcard .btn{width:100%;height:50px;font-size:15px}
+
+.shell{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100vh}
+.side{position:sticky;top:0;display:flex;flex-direction:column;height:100vh;padding:26px 16px 18px;border-right:1px solid var(--line);background:var(--bar)}
+.side .brand{padding:0 10px 30px}
+#nav{display:flex;flex-direction:column;gap:3px}
+#nav button{display:flex;align-items:center;gap:12px;height:44px;padding:0 13px;border-radius:12px;font-size:14px;font-weight:600;color:var(--text2);text-align:left;transition:background-color .2s,color .2s,box-shadow .2s}
+#nav button:hover{background:var(--wash);color:var(--text)}
+#nav .on{background:var(--elev);box-shadow:inset 0 0 0 1px var(--edge);color:var(--text)}
+#nav .on .ic{color:var(--gold-ink)}
+#nav .ic{width:20px;height:20px}
+.foot{display:flex;align-items:center;gap:6px;margin-top:auto;padding:14px 4px 0;border-top:1px solid var(--line)}
+.foot .btn{flex:1}
+.mtop{display:none}
+main{width:100%;max-width:1240px;min-width:0;padding:32px 40px 120px}
+.view{display:none}
+.view.on{display:block;animation:rise .5s var(--ease) both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.98)}}
+.vh{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px 16px;margin-bottom:22px}
+h1{font-size:28px;line-height:1.2;font-weight:700;letter-spacing:-.03em}
+.vh p{font-size:13.5px;color:var(--text2)}
+h2{font-size:15px;font-weight:600;letter-spacing:-.015em;white-space:nowrap}
+h2 small{margin-left:7px;font-size:12.5px;font-weight:500;letter-spacing:0;color:var(--text3)}
+.panel{border:1px solid var(--line);border-radius:18px;background:var(--panel);box-shadow:var(--sh)}
+.pad{padding:20px 22px}
+.ph{display:flex;align-items:baseline;justify-content:space-between;gap:12px;min-height:24px}
+.ph>span{font-size:12.5px;color:var(--text2);white-space:nowrap}
+.ph>span b{font-weight:600;color:var(--text)}
+.muted{color:var(--text3)}
+.pos{color:var(--pos)}
+.neg{color:var(--neg)}
+
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));margin-bottom:16px}
+.kpi{min-width:0;padding:18px 20px 17px}
+.kpi+.kpi{border-left:1px solid var(--line)}
+.kpi .lab{font-size:12.5px;color:var(--text2)}
+.kpi .val{margin-top:6px;overflow:hidden;font-size:25px;line-height:1.2;font-weight:600;letter-spacing:-.025em;white-space:nowrap;text-overflow:ellipsis}
+.kpi .val i{margin-left:.14em;font-size:.56em;font-weight:500;letter-spacing:0;color:var(--text2)}
+.kpi .sub{margin-top:4px;overflow:hidden;font-size:12px;color:var(--text3);white-space:nowrap;text-overflow:ellipsis}
+.dash{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);align-items:start;gap:16px}
+.dash .rk{grid-column:2;grid-row:1/span 3}
+
+.chart{position:relative;margin-top:14px}
+.chart svg{display:block;overflow:visible}
+.gl{stroke:var(--line)}
+.gl.b{stroke:var(--line2)}
+.avl{stroke:var(--text3);stroke-dasharray:2 3}
+.key{display:inline-block;width:12px;margin-right:6px;border-top:1.5px dashed var(--text3);vertical-align:middle}
+.tk{font-size:11px;fill:var(--text3)}
+.pk{font-size:11px;font-weight:600;fill:var(--text2);stroke:var(--surface);stroke-width:5px;stroke-linejoin:round;paint-order:stroke}
+.nil{font-size:12.5px;fill:var(--text3)}
+.bars path{fill:url(#gBar);transform-box:fill-box;transform-origin:50% 100%;transition:opacity .15s;animation:grow .8s var(--ease) both;animation-delay:calc(var(--d)*12ms)}
+@keyframes grow{from{transform:scaleY(0)}}
+.xh{stroke:var(--line2);opacity:0}
+.hov .xh{opacity:1}
+.hov .pk{opacity:0}
+.hov .bars path{opacity:.34}
+.hov .bars path.on{opacity:1}
+.tip{position:absolute;top:-8px;left:0;display:flex;align-items:baseline;gap:7px;padding:6px 10px;border-radius:10px;background:var(--elev);box-shadow:inset 0 0 0 1px var(--line2),var(--float);font-size:12px;color:var(--text2);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s}
+.tip b{font-size:13px;font-weight:600;color:var(--text)}
+.hov .tip{opacity:1}
+
+.rl{margin-top:10px}
+.rr{display:flex;align-items:center;gap:12px;width:100%;min-height:50px;padding:6px 8px;margin:0 -8px;border-radius:12px;text-align:left;transition:background-color .15s}
+button.rr:hover{background:var(--wash)}
+.rr+.rr{box-shadow:0 -1px 0 var(--line)}
+.rn{flex:none;width:24px;font-size:13.5px;font-weight:600;color:var(--text3);text-align:center}
+.av{display:grid;flex:none;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--elev);box-shadow:inset 0 0 0 1px var(--line2);font-size:13.5px;font-weight:600;line-height:1;color:var(--text2)}
+.m1 .av{border:1.5px solid transparent;background:linear-gradient(var(--elev),var(--elev)) padding-box,var(--metal) border-box;box-shadow:none;color:var(--gold-ink)}
+.m2 .av{box-shadow:inset 0 0 0 1.5px var(--p2);color:var(--text)}
+.m3 .av{box-shadow:inset 0 0 0 1.5px var(--p3);color:var(--text)}
+.m1 .rn{color:var(--gold-ink)}
+.rr b{flex:1;min-width:0;overflow:hidden;font-weight:600;white-space:nowrap;text-overflow:ellipsis}
+.rr em{flex:none;font-weight:600;color:var(--text2)}
+.m1 em{color:var(--gold-ink)}
+
+.tool{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:14px}
+.tool .inp{flex:1;min-width:240px}
+.seg{position:relative;display:inline-grid;grid-auto-columns:minmax(0,1fr);grid-auto-flow:column;padding:4px;border:1px solid var(--line);border-radius:13px;background:var(--surface)}
+.seg button{height:34px;padding:0 14px;border-radius:9px;font-size:13px;font-weight:600;color:var(--text2);white-space:nowrap;transition:background-color .2s,color .2s,box-shadow .2s}
+.seg button:hover{color:var(--text)}
+.seg .on{background:var(--elev);box-shadow:inset 0 0 0 1px var(--edge),0 2px 6px -2px rgba(0,0,0,.35);color:var(--text)}
+
+.tbl{overflow:hidden}
+.thead,.trow{display:grid;grid-template-columns:var(--cols);align-items:center;gap:14px;padding:0 22px}
+.thead{height:44px;border-bottom:1px solid var(--line);font-size:12px;font-weight:600;color:var(--text3)}
+.trow{width:100%;min-height:62px;padding-top:9px;padding-bottom:9px;border-bottom:1px solid var(--line);text-align:left}
+.trow:last-child{border-bottom:0}
+button.trow{transition:background-color .15s}
+button.trow:hover{background:var(--wash)}
+.n{text-align:right;white-space:nowrap}
+.n b{font-weight:600}
+.sh{display:none}
+.who{display:flex;align-items:center;gap:12px;min-width:0}
+.who>span{min-width:0}
+.who b,.who small{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.who b{font-weight:600}
+.who small{font-size:12px;color:var(--text3)}
+.u{--cols:minmax(0,2.6fr) repeat(4,minmax(0,1fr)) minmax(96px,1fr)}
+.l{--cols:112px minmax(0,1.6fr) 72px minmax(0,1.1fr) minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)}
+.l .trow{min-height:54px}
+.c-meta{display:none}
+.tag{display:inline-block;height:22px;padding:0 8px;border-radius:7px;background:var(--elev);box-shadow:inset 0 0 0 1px var(--line2);font-size:11.5px;font-weight:600;line-height:22px;color:var(--text2)}
+.tag.points{background:var(--wash);box-shadow:inset 0 0 0 1px var(--edge);color:var(--gold-ink)}
+.cut{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.pager{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:14px}
+.pager span{margin-right:6px;font-size:13px;color:var(--text2)}
+.empty{display:flex;flex-direction:column;align-items:center;gap:4px;padding:48px 20px;color:var(--text3);text-align:center}
+.empty .ic{width:28px;height:28px;margin-bottom:10px;stroke-width:1.25}
+.empty p{font-size:14.5px;font-weight:600;color:var(--text2)}
+.empty span{font-size:13px}
+.empty .btn{margin-top:14px}
+
+.sec{margin-bottom:16px}
+.sec>.ph{margin-bottom:4px}
+.sec .desc{font-size:13px;color:var(--text3)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:18px}
+.sw{display:inline-flex;align-items:center;gap:12px;cursor:pointer;font-size:14px;font-weight:600}
+.sw input{flex:none;appearance:none;-webkit-appearance:none;width:48px;height:28px;padding:0;border:0;border-radius:14px;background:var(--line2);box-shadow:none;cursor:pointer;transition:background .25s}
+.sw input::before{content:"";display:block;width:22px;height:22px;margin:3px;border-radius:50%;background:#F3EDE0;box-shadow:0 1px 3px rgba(0,0,0,.4);transition:transform .25s var(--ease)}
+.sw input:checked{background:linear-gradient(#EAD8A7,#C3A267)}
+.sw input:checked::before{background:#17120A;transform:translateX(20px)}
+.sw input:focus{box-shadow:0 0 0 3px var(--wash)}
+.slots{margin-top:18px}
+.sl-h,.slot{display:grid;grid-template-columns:30px minmax(0,1fr) minmax(0,.8fr) minmax(0,1.3fr) 38px;align-items:center;gap:12px}
+.sl-h{padding-bottom:8px;font-size:12px;font-weight:600;color:var(--text3)}
+.slot{padding:6px 0}
+.slot .no{font-size:13px;font-weight:600;color:var(--text3);text-align:center}
+.prob{display:flex;align-items:center;gap:10px}
+.prob i{flex:1;height:6px;overflow:hidden;border-radius:3px;background:var(--line)}
+.prob i::before{content:"";display:block;width:var(--w);height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--gold-ink));transition:width .3s var(--ease)}
+.prob b{flex:none;width:52px;font-size:13px;font-weight:600;text-align:right}
+.acts{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-top:14px}
+.acts span{font-size:13px;color:var(--text2)}
+.acts span b{font-weight:600;color:var(--text)}
+.off .slots,.off .acts{opacity:.45}
+.lg-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}
+.lgc{padding:16px 16px 10px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.lgc h3{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px;font-size:14px;font-weight:600}
+.lgc h3 small{font-size:12px;font-weight:500;color:var(--text3)}
+.lgr{display:grid;grid-template-columns:88px minmax(0,1fr) 38px;gap:8px;padding:4px 0}
+.lgr input{height:38px;padding:0 11px;border-radius:10px;font-size:13.5px}
+.lgc .none{padding:10px 0 14px;font-size:13px;color:var(--text3)}
+.find{margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
+.find form{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.find .inp{flex:1;min-width:200px}
+.res{margin-top:12px}
+.res .rr{cursor:default}
+.res .rr small{margin-left:8px;font-size:12px;color:var(--text3)}
+.res .rr>span{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.res .id{flex:none;width:64px;font-size:12.5px;color:var(--text3)}
+.danger-zone{border-color:var(--neg-edge)}
+.danger-zone .acts{justify-content:flex-start}
+.save{position:fixed;right:0;bottom:0;left:240px;z-index:25;display:flex;justify-content:center;padding:0 24px 22px;opacity:0;visibility:hidden;pointer-events:none;transform:translateY(40px);transition:transform .45s var(--ease),opacity .3s,visibility .45s}
+.save.on{opacity:1;visibility:visible;transform:none}
+.save>div{display:flex;align-items:center;gap:10px;padding:10px 10px 10px 20px;border-radius:16px;background:var(--elev);box-shadow:inset 0 0 0 1px var(--edge),var(--float);pointer-events:auto}
+.save p{margin-right:8px;font-size:13.5px;font-weight:600;white-space:nowrap}
+
+.compose{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px;align-items:start}
+.tb{display:flex;flex-wrap:wrap;gap:4px;margin:14px 0 10px}
+.tb button{min-width:38px;height:34px;padding:0 10px;border-radius:9px;box-shadow:inset 0 0 0 1px var(--line);font-size:13.5px;font-weight:600;color:var(--text2);transition:background-color .2s,color .2s}
+.tb button:hover{background:var(--wash);color:var(--text)}
+.tb .bi{font-weight:800}
+.tb .it{font-style:italic}
+.tb .un{text-decoration:underline}
+.cnt{margin-top:8px;font-size:12px;color:var(--text3);text-align:right}
+.send{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;margin-top:18px}
+.bubble{max-width:420px;margin-top:14px;padding:12px 14px 9px;border-radius:16px 16px 16px 6px;background:var(--elev);box-shadow:inset 0 0 0 1px var(--line2);font-size:14px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+.bubble b,.bubble strong{font-weight:700}
+.bubble i,.bubble em{font-style:italic}
+.bubble u{text-decoration:underline}
+.bubble a{color:var(--gold-ink)}
+.bubble blockquote{margin:4px 0;padding:2px 0 2px 10px;border-left:3px solid var(--gold);border-radius:2px}
+.bubble code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
+.bubble time{display:block;margin-top:4px;font-size:11px;color:var(--text3);text-align:right}
+
+dialog{width:min(460px,calc(100vw - 32px));max-height:calc(100vh - 32px);margin:auto;padding:0;border:1px solid var(--line2);border-radius:22px;background:var(--elev);color:var(--text);box-shadow:var(--float)}
+dialog[open]{animation:pop .3s var(--ease)}
+dialog::backdrop{background:rgba(8,7,5,.6)}
+.dlg{padding:22px}
+.dh{display:flex;align-items:center;gap:14px}
+.dh>div{flex:1;min-width:0}
+.dh h3{overflow:hidden;font-size:18px;font-weight:700;letter-spacing:-.02em;white-space:nowrap;text-overflow:ellipsis}
+.dh p{overflow:hidden;font-size:12.5px;color:var(--text3);white-space:nowrap;text-overflow:ellipsis}
+.dh .av{width:44px;height:44px;font-size:17px}
+.bal2{display:grid;grid-template-columns:1fr 1fr;margin:20px 0 18px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.bal2>div{min-width:0;padding:12px 16px}
+.bal2>div+div{border-left:1px solid var(--line)}
+.bal2 span{display:block;font-size:12px;color:var(--text2)}
+.bal2 b{display:block;overflow:hidden;font-size:19px;font-weight:600;letter-spacing:-.02em;white-space:nowrap;text-overflow:ellipsis}
+.dlg .seg{display:grid;width:100%;margin-bottom:14px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chips button{height:30px;padding:0 11px;border-radius:15px;box-shadow:inset 0 0 0 1px var(--line2);font-size:12.5px;font-weight:600;color:var(--text2)}
+.chips button:hover{box-shadow:inset 0 0 0 1px var(--edge);color:var(--text)}
+.pv{min-height:42px;margin-top:14px;padding:11px 14px;border-radius:12px;background:var(--surface);font-size:13px;color:var(--text2)}
+.pv b{font-weight:600;color:var(--text)}
+.df{display:flex;gap:10px;margin-top:20px}
+.df .btn{flex:1}
+.cf p{margin-top:8px;font-size:14px;line-height:1.6;color:var(--text2);word-break:keep-all}
+.cf h3{font-size:18px;font-weight:700;letter-spacing:-.02em}
+
+.toast{position:fixed;bottom:26px;left:50%;z-index:100;max-width:min(560px,calc(100vw - 32px));padding:12px 18px;border-radius:14px;background:var(--elev);box-shadow:inset 0 0 0 1px var(--edge),var(--float);font-size:13.5px;font-weight:600;opacity:0;transform:translate(-50%,14px);pointer-events:none;transition:opacity .25s,transform .4s var(--ease)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.toast.err{box-shadow:inset 0 0 0 1px var(--neg-edge),var(--float);color:var(--neg)}
+
+.sk{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:18px;background:var(--surface)}
+.sk::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,var(--shim) 50%,transparent 70%);transform:translateX(-100%);animation:shim 1.5s infinite}
+@keyframes shim{to{transform:translateX(100%)}}
+.sks{display:grid;gap:16px}
+
+@media(max-width:1280px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.kpi:nth-child(4){border-left:0}.kpi:nth-child(n+4){border-top:1px solid var(--line)}}
+@media(max-width:1100px){.dash,.compose{grid-template-columns:minmax(0,1fr)}.dash .rk{grid-column:auto;grid-row:auto}.l{--cols:100px minmax(0,1.5fr) 64px minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)}.l .c-a{display:none}}
+@media(max-width:900px){
+.shell{display:block}
+.side{position:fixed;inset:auto 0 0;z-index:30;height:auto;flex-direction:row;padding:0 6px env(safe-area-inset-bottom);border-top:1px solid var(--line);border-right:0}
+.side .brand,.side .foot{display:none}
+#nav{flex:1;flex-direction:row;gap:0}
+#nav button{flex:1;flex-direction:column;justify-content:center;gap:4px;height:62px;padding:0;border-radius:0;background:none;box-shadow:none;font-size:11px}
+#nav .ic{width:22px;height:22px}
+#nav button,#nav button:hover,#nav .on{background:none;box-shadow:none}
+#nav button:hover{color:var(--text2)}
+#nav .on,#nav .on:hover{color:var(--text)}
+.mtop{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:6px;height:58px;padding:0 10px 0 18px;border-bottom:1px solid var(--line);background:var(--bar)}
+.mtop .brand{flex:1}
+main{padding:20px 16px 120px}
+h1{font-size:24px}
+.save{left:0;padding:0 12px 82px}
+.toast{bottom:84px}
+.grid2,.lg-grid{grid-template-columns:minmax(0,1fr)}
 }
+@media(max-width:760px){
+.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+.kpi:nth-child(n){border-left:0;border-top:0}
+.kpi:nth-child(even){border-left:1px solid var(--line)}
+.kpi:nth-child(n+3){border-top:1px solid var(--line)}
+.kpi{padding:15px 16px}
+.kpi .val{font-size:22px}
+.pad{padding:18px 16px}
+.thead{display:none}
+.tool .inp{min-width:100%}
+.tool .seg{width:100%}
+.u .trow{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 8px;padding:14px 16px}
+.u .trow>.who{grid-column:1/-1}
+.u .n{text-align:left}
+.u .n::before{content:attr(data-l);display:block;font-size:11px;color:var(--text3)}
+.u .c-time{display:none}
+.u .lg{display:none}
+.u .sh{display:inline}
+.l .trow{grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;padding:12px 16px}
+.l .c-t,.l .c-k,.l .c-r,.l .c-a{display:none}
+.l .c-meta{display:block;grid-column:1;overflow:hidden;font-size:12px;color:var(--text3);white-space:nowrap;text-overflow:ellipsis}
+.l .c-who{grid-column:1;grid-row:1}
+.l .c-d{grid-column:2;grid-row:1}
+.l .c-b{grid-column:2;grid-row:2;font-size:12px;color:var(--text3)}
+.slot,.sl-h{grid-template-columns:22px minmax(0,1fr) minmax(0,.8fr) 38px;gap:8px}
+.slot .prob{grid-column:2/4;grid-row:2;margin-top:-2px}
+.sl-h span:nth-child(4){display:none}
+.lgr{grid-template-columns:76px minmax(0,1fr) 38px}
+.save p{display:none}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
-<div id="login" hidden>
-  <form id="loginForm">
-    <h1>🔐 관리자 로그인</h1>
-    <input id="lu" placeholder="아이디" autocomplete="username" required>
-    <input id="lp" type="password" placeholder="비밀번호" autocomplete="current-password" required>
-    <div id="loginError"></div>
-    <button class="primary">로그인</button>
-  </form>
+<svg class="defs" aria-hidden="true"><defs><linearGradient id="gBar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--gold-ink)"/><stop offset="1" style="stop-color:var(--gold);stop-opacity:.5"/></linearGradient></defs></svg>
+
+<div id="login" class="login" hidden>
+<form id="lf" class="lcard" novalidate>
+<p class="brand"><svg viewBox="0 0 9 11"><path d="M4.5 0 9 5.5 4.5 11 0 5.5Z"/></svg><span class="foil bn">FAMILY</span><em>ADMIN</em></p>
+<h1>관리자 로그인</h1>
+<p>그룹방 운영 도구입니다.</p>
+<label class="fld"><span>아이디</span><input id="lu" autocomplete="username" autocapitalize="off" spellcheck="false" required></label>
+<label class="fld"><span>비밀번호</span><input id="lp" type="password" autocomplete="current-password" required></label>
+<p class="err" id="le" role="alert"></p>
+<button class="btn gold" id="lb">로그인</button>
+</form>
 </div>
 
-<div id="shell" hidden>
-  <aside id="nav">
-    <div class="brand">🤖 패밀리봇</div>
-    <button data-view="dashboard">📊 대시보드</button>
-    <button data-view="users">👥 회원</button>
-    <button data-view="logs">🧾 내역</button>
-    <button data-view="settings">⚙️ 설정</button>
-    <button data-view="notice">📢 공지</button>
-    <div class="spacer"></div>
-    <button id="logout">로그아웃</button>
-  </aside>
-  <main>
-    <section data-view="dashboard">
-      <h1>대시보드</h1>
-      <div class="tiles" id="tiles"></div>
-      <div class="cols">
-        <div class="card"><h2>일별 채팅 · 최근 30일</h2><div class="chart" id="cDaily"></div></div>
-        <div class="card"><h2>일별 활동 인원 · 최근 30일</h2><div class="chart" id="cUsers"></div></div>
-        <div class="card"><h2>시간대별 채팅 · 최근 30일 합계</h2><div class="chart" id="cHours"></div></div>
-        <div class="card"><h2>🏆 채팅 랭킹 · <span id="dashPeriod"></span></h2><div class="scroll"><table><tbody id="dashRank"></tbody></table></div></div>
-      </div>
-    </section>
+<div id="shell" class="shell" hidden>
+<aside class="side">
+<p class="brand"><svg viewBox="0 0 9 11"><path d="M4.5 0 9 5.5 4.5 11 0 5.5Z"/></svg><span class="foil bn">FAMILY</span><em>ADMIN</em></p>
+<nav id="nav" aria-label="메뉴"></nav>
+<div class="foot"><button class="ib th" type="button" aria-label="테마 전환"></button><button class="btn line sm lo" type="button">로그아웃</button></div>
+</aside>
+<div>
+<header class="mtop"><p class="brand"><svg viewBox="0 0 9 11"><path d="M4.5 0 9 5.5 4.5 11 0 5.5Z"/></svg><span class="foil bn">FAMILY</span><em>ADMIN</em></p><button class="ib th" type="button" aria-label="테마 전환"></button><button class="ib lo" type="button" aria-label="로그아웃"></button></header>
+<main>
+<section class="view" id="v-dashboard"><header class="vh"><h1>대시보드</h1><p id="d-sub">최근 30일</p></header><div id="d-body"></div></section>
 
-    <section data-view="users" hidden>
-      <h1>회원</h1>
-      <div class="card">
-        <div class="bar-row">
-          <input class="grow" id="uq" placeholder="이름 · @유저네임 · ID 검색">
-          <select id="usort"><option value="points">포인트순</option><option value="tickets">이용권순</option><option value="messages">채팅순</option><option value="recent">최근 활동순</option></select>
-        </div>
-        <div class="scroll"><table>
-          <thead><tr><th>이름</th><th>유저네임</th><th>ID</th><th class="n">포인트</th><th class="n">이용권</th><th class="n">채팅</th><th class="n">출석</th><th>최근 활동</th></tr></thead>
-          <tbody id="urows"></tbody>
-        </table></div>
-        <div class="pager"><span class="hint" id="uinfo"></span><button id="uprev">이전</button><button id="unext">다음</button></div>
-      </div>
-    </section>
+<section class="view" id="v-users"><header class="vh"><h1>회원</h1><p id="u-info"></p></header>
+<div class="tool"><div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13ZM20 20l-4.8-4.8"/></svg><input id="uq" type="search" placeholder="이름 · @유저네임 · ID" autocomplete="off"></div>
+<div class="seg" id="us"><button type="button" data-sort="points" class="on">포인트</button><button type="button" data-sort="tickets">이용권</button><button type="button" data-sort="messages">채팅</button><button type="button" data-sort="recent">최근 활동</button></div></div>
+<div class="panel tbl u"><div class="thead"><span>회원</span><span class="n">포인트</span><span class="n">이용권</span><span class="n">채팅</span><span class="n">출석</span><span class="n">최근 활동</span></div><div id="u-list"></div></div>
+<div class="pager"><span id="u-page"></span><button class="btn line sm" type="button" id="u-prev">이전</button><button class="btn line sm" type="button" id="u-next">다음</button></div>
+</section>
 
-    <section data-view="logs" hidden>
-      <h1>내역</h1>
-      <div class="card">
-        <div class="bar-row"><input class="grow" id="lq" placeholder="이름 · @유저네임 · ID 검색"></div>
-        <div class="scroll"><table>
-          <thead><tr><th>시각</th><th>회원</th><th>구분</th><th>사유</th><th class="n">변동</th><th class="n">잔여</th><th>처리자</th></tr></thead>
-          <tbody id="lrows"></tbody>
-        </table></div>
-        <div class="pager"><span class="hint" id="linfo"></span><button id="lprev">이전</button><button id="lnext">다음</button></div>
-      </div>
-    </section>
+<section class="view" id="v-logs"><header class="vh"><h1>내역</h1><p id="l-info"></p></header>
+<div class="tool"><div class="inp"><svg class="ic" viewBox="0 0 24 24"><path d="M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13ZM20 20l-4.8-4.8"/></svg><input id="lq" type="search" placeholder="이름 · @유저네임 · ID" autocomplete="off"></div></div>
+<div class="panel tbl l"><div class="thead"><span>시각</span><span>회원</span><span>구분</span><span>사유</span><span class="n">변동</span><span class="n">잔액</span><span class="c-a">처리</span></div><div id="l-list"></div></div>
+<div class="pager"><span id="l-page"></span><button class="btn line sm" type="button" id="l-prev">이전</button><button class="btn line sm" type="button" id="l-next">다음</button></div>
+</section>
 
-    <section data-view="settings" hidden>
-      <h1>설정</h1>
-      <div class="card">
-        <h2>🏆 랭킹 · 출석</h2>
-        <div class="field"><label>/랭킹 집계 기간</label><select id="sPeriod"><option value="day">일간</option><option value="week">주간</option><option value="month">월간</option><option value="all">전체</option></select></div>
-        <div class="field"><label>출석 보상 (P)</label><input id="sAttend" type="number" min="0"></div>
-      </div>
-      <div class="card">
-        <h2>🎡 룰렛</h2>
-        <div class="field"><label>사용</label><label class="switch"><input type="checkbox" id="sRoulette"><span id="sRouletteLabel"></span></label></div>
-        <div class="slot hint"><span>당첨 포인트 (0 = 꽝)</span><span>가중치</span><span>확률</span><span></span></div>
-        <div id="slots"></div>
-        <button id="addSlot">+ 칸 추가</button>
-      </div>
-      <div class="card">
-        <h2>📅 경기</h2>
-        <div class="field"><label>캐시 시간 (초)</label><input id="sCache" type="number" min="30" max="3600"></div>
-        <div class="cols" id="leagues"></div>
-        <h2 style="margin-top:18px">리그 검색</h2>
-        <div class="bar-row">
-          <select id="lsSport"></select>
-          <input class="grow" id="lsQuery" placeholder="영문 리그명 3글자 이상 (예: korea, v-league)">
-          <button id="lsGo">검색</button>
-        </div>
-        <div class="scroll"><table><tbody id="lsRows"></tbody></table></div>
-      </div>
-      <div class="card">
-        <h2>⚠️ 초기화</h2>
-        <div class="bar-row">
-          <button class="danger" data-reset="points">전체 포인트 초기화</button>
-          <button class="danger" data-reset="tickets">전체 이용권 초기화</button>
-          <button class="danger" data-reset="chat">채팅 횟수 초기화</button>
-        </div>
-        <div class="hint">즉시 적용되며 되돌릴 수 없습니다.</div>
-      </div>
-      <div class="savebar"><button class="primary" id="save">설정 저장</button><span class="hint">룰렛 · 경기 · 랭킹 · 출석 설정은 저장해야 적용됩니다.</span></div>
-    </section>
+<section class="view" id="v-settings"><header class="vh"><h1>설정</h1><p>저장해야 반영됩니다.</p></header><div id="s-body"></div></section>
 
-    <section data-view="notice" hidden>
-      <h1>공지</h1>
-      <div class="card">
-        <textarea id="nText" placeholder="그룹방에 보낼 내용"></textarea>
-        <div class="hint" style="margin:8px 0 14px">사용 가능: &lt;b&gt;굵게&lt;/b&gt; · &lt;i&gt;기울임&lt;/i&gt; · &lt;u&gt;밑줄&lt;/u&gt; · &lt;blockquote&gt;인용&lt;/blockquote&gt; · &lt;a href="…"&gt;링크&lt;/a&gt;</div>
-        <div class="bar-row"><label class="switch"><input type="checkbox" id="nPin">상단 고정</label><span class="grow"></span><button class="primary" id="nSend">보내기</button></div>
-      </div>
-    </section>
-  </main>
+<section class="view" id="v-notice"><header class="vh"><h1>공지</h1><p>그룹방에 봇 이름으로 보냅니다.</p></header>
+<div class="compose">
+<div class="panel pad"><div class="ph"><h2>내용</h2></div>
+<div class="tb" id="tb"><button type="button" class="bi" data-w="b" title="굵게">B</button><button type="button" class="it" data-w="i" title="기울임">I</button><button type="button" class="un" data-w="u" title="밑줄">U</button><button type="button" data-w="blockquote" title="인용">인용</button><button type="button" data-w="code" title="코드">코드</button><button type="button" data-w="a" title="링크">링크</button></div>
+<textarea id="nt" maxlength="4000" placeholder="그룹방에 보낼 내용"></textarea>
+<p class="cnt" id="nc">0 / 4,000</p>
+<div class="send"><label class="sw"><input type="checkbox" id="np">상단 고정</label><button class="btn gold" type="button" id="ns" disabled><svg class="ic" viewBox="0 0 24 24"><path d="M20 4 4 11l6.5 2.5L13 20l7-16ZM10.5 13.5 20 4"/></svg>보내기</button></div>
+</div>
+<div class="panel pad"><div class="ph"><h2>미리보기</h2><span>텔레그램 표시</span></div><div class="bubble" id="nv"></div></div>
+</div>
+</section>
+</main>
+</div>
+<div class="save" id="save"><div><p>저장하지 않은 변경사항</p><button class="btn line sm" type="button" id="s-undo">되돌리기</button><button class="btn gold sm" type="button" id="s-save">저장</button></div></div>
 </div>
 
-<dialog id="dlg">
-  <h2 id="dName"></h2>
-  <div class="hint" id="dMeta" style="margin-bottom:16px"></div>
-  <div class="bar-row">
-    <select id="dKind"><option value="points">포인트</option><option value="tickets">이용권</option></select>
-    <input class="grow" id="dAmount" type="number" min="1" placeholder="수량">
-  </div>
-  <div class="bar-row"><button class="primary grow" id="dGive">지급</button><button class="danger grow" id="dTake">회수</button><button id="dClose">닫기</button></div>
-</dialog>
-<div id="toast"></div>
+<dialog id="adj" aria-labelledby="a-name"><div class="dlg">
+<div class="dh"><span class="av" id="a-av"></span><div><h3 id="a-name"></h3><p id="a-meta"></p></div><button class="ib" type="button" data-close aria-label="닫기"><svg class="ic" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+<div class="bal2"><div><span>포인트</span><b id="a-pts"></b></div><div><span>이용권</span><b id="a-tix"></b></div></div>
+<div class="seg" id="a-kind"><button type="button" data-k="points" class="on">포인트</button><button type="button" data-k="tickets">이용권</button></div>
+<label class="fld"><span>수량</span><span class="inp"><input id="a-amt" inputmode="numeric" autocomplete="off" placeholder="0"><em id="a-unit">P</em></span></label>
+<div class="chips" id="a-chips"></div>
+<p class="pv" id="a-pv"></p>
+<div class="df"><button class="btn danger" type="button" id="a-take">회수</button><button class="btn gold" type="button" id="a-give">지급</button></div>
+</div></dialog>
+
+<dialog id="cf" aria-labelledby="cf-t"><form method="dialog" class="dlg cf"><h3 id="cf-t"></h3><p id="cf-b"></p><div class="df"><button class="btn line" value="cancel">취소</button><button class="btn" value="ok" id="cf-ok"></button></div></form></dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
-const $ = (id) => document.getElementById(id);
-const fmt = (n) => Number(n).toLocaleString("ko-KR");
-const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const PERIODS = { day: "일간", week: "주간", month: "월간", all: "전체" };
-const REASONS = { grant: "명령어 지급", revoke: "명령어 회수", attend: "출석", roulette: "룰렛", admin: "관리자 조정", reset: "전체 초기화" };
-const KINDS = { points: "포인트", tickets: "이용권", chat: "채팅" };
-const SPORTS = { football: "⚽ 축구", basketball: "🏀 농구", baseball: "⚾ 야구", volleyball: "🏐 배구" };
-const MEDALS = ["🥇", "🥈", "🥉"];
-let cfg = null, upage = 0, lpage = 0, current = null;
+(() => {
+"use strict";
+const D = document, R = D.documentElement;
+const $ = (s, p = D) => p.querySelector(s), $$ = (s, p = D) => [...p.querySelectorAll(s)];
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+const fmt = (n) => Number(n || 0).toLocaleString("ko-KR");
+const kfmt = (v) => (v >= 1e8 ? +(v / 1e8).toFixed(1) + "억" : v >= 1e4 ? +(v / 1e4).toFixed(1) + "만" : fmt(v));
+const mono = (s) => (Array.from(String(s ?? "").trim())[0] || "·").toUpperCase();
+const md = (d) => `${+d.slice(5, 7)}.${+d.slice(8, 10)}`;
+const big = (v) => (v >= 1e8 ? kfmt(v) : fmt(v));
+const amt = (v) => (v >= 1e8 ? `<span class="lg">${fmt(v)}</span><span class="sh">${kfmt(v)}</span>` : fmt(v));
+const ts = (s) => (s ? `${md(s)} ${s.slice(11, 16)}` : "–");
+const f1 = (x) => +x.toFixed(1);
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const PERIOD = { day: "일간", week: "주간", month: "월간", all: "전체" };
+const KIND = { points: "포인트", tickets: "이용권", chat: "채팅" };
+const UNIT = { points: " P", tickets: "장", chat: "회" };
+const REASON = { grant: "명령어 지급", revoke: "명령어 회수", attend: "출석", roulette: "룰렛", admin: "관리자 조정", reset: "전체 초기화" };
+const SPORT = { football: "축구", basketball: "농구", baseball: "야구", volleyball: "배구" };
+const VIEWS = [["dashboard", "대시보드"], ["users", "회원"], ["logs", "내역"], ["settings", "설정"], ["notice", "공지"]];
+const IC = {
+  dashboard: "M4.5 4.5h6v7h-6zM13.5 4.5h6v4h-6zM13.5 11.5h6v8h-6zM4.5 14.5h6v5h-6z",
+  users: "M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM3.5 19.5c.6-3 2.8-4.8 5.5-4.8s4.9 1.8 5.5 4.8M15.5 4.4a3.5 3.5 0 0 1 0 6.3M17.5 14.9c1.6.7 2.6 2.3 3 4.6",
+  logs: "M9 7h10M9 12h10M9 17h10M5 7h.01M5 12h.01M5 17h.01",
+  settings: "M4.5 7.5h8M16.5 7.5h3M4.5 16.5h3M11.5 16.5h8M14.5 5.5v4M9.5 14.5v4",
+  notice: "M4.5 10v4a1 1 0 0 0 1 1h2l5 4V5l-5 4h-2a1 1 0 0 0-1 1ZM16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11",
+  sun: "M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM12 2.5v2M12 19.5v2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M2.5 12h2M19.5 12h2M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4",
+  moon: "M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10Z",
+  logout: "M14 4.5h3.5A1.5 1.5 0 0 1 19 6v12a1.5 1.5 0 0 1-1.5 1.5H14M10 16l-4-4 4-4M6 12h9",
+  trash: "M5 7h14M10 7V5h4v2M7 7l1 12.5h8L17 7",
+  plus: "M12 5v14M5 12h14",
+  rank: "M4 8.5l4.2 3.7L12 5.5l3.8 6.7L20 8.5 18.5 18h-13L4 8.5Z",
+  search: "M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13ZM20 20l-4.8-4.8",
+  alert: "M12 4.5 20.5 19h-17ZM12 10v4M12 16.5h.01",
+  refresh: "M19.5 12a7.5 7.5 0 1 1-2.3-5.4M19.5 4.5V8H16",
+};
+const icon = (n) => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="${IC[n]}"/></svg>`;
+const empty = (ic, a, b = "") => `<div class="empty">${icon(ic)}<p>${a}</p><span>${b}</span></div>`;
 
-function toast(text) {
-  $("toast").textContent = text; $("toast").classList.add("on");
-  clearTimeout(toast.t); toast.t = setTimeout(() => $("toast").classList.remove("on"), 2200);
+let view, cfg, saved = "", dash, cur, kind = "points", uq = "", us = "points", up = 0, lq = "", lp = 0, found = [], sport = "football", width = innerWidth;
+const pages = {};
+
+function toast(msg, err) {
+  const t = $("#toast");
+  t.textContent = msg; t.className = "toast on" + (err ? " err" : "");
+  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove("on"), err ? 4200 : 2600);
 }
 
 async function api(path, method = "GET", body) {
-  const res = await fetch(path, { method, headers: body ? { "Content-Type": "application/json" } : {}, body: body ? JSON.stringify(body) : undefined });
+  let res;
+  try { res = await fetch(path, { method, headers: body ? { "Content-Type": "application/json" } : {}, body: body ? JSON.stringify(body) : undefined, credentials: "same-origin" }); }
+  catch { throw Object.assign(new Error("서버에 연결할 수 없습니다. 잠시 후 다시 시도하세요."), { status: 0 }); }
   const data = await res.json().catch(() => ({}));
-  if (res.status === 401 && path !== "/api/login") { showLogin(); throw new Error("로그인이 필요합니다."); }
-  if (!res.ok) throw new Error(typeof data.detail === "string" ? data.detail : "입력값을 확인하세요.");
+  if (res.status === 401 && path !== "/api/login") { login("세션이 만료되었습니다. 다시 로그인하세요."); throw Object.assign(new Error(""), { quiet: true }); }
+  if (!res.ok) throw Object.assign(new Error(typeof data.detail === "string" ? data.detail : "요청을 처리하지 못했습니다."), { status: res.status });
   return data;
 }
-const run = (fn) => async (...a) => { try { await fn(...a); } catch (e) { toast(e.message); } };
+const safe = (fn) => async (...a) => { try { return await fn(...a); } catch (e) { if (!e.quiet) toast(e.message, 1); } };
 
-function showLogin() { $("shell").hidden = true; $("login").hidden = false; }
-
-function barChart(el, items) {
-  const W = el.clientWidth || 420, H = 170, top = 10, bottom = 20, max = Math.max(1, ...items.map((d) => d.value));
-  const step = W / items.length, bw = Math.max(2, Math.min(18, step - 2)), ph = H - top - bottom, every = Math.ceil(items.length / 8);
-  let svg = [0, .5, 1].map((f) => `<line class="gridline" x1="0" x2="${W}" y1="${top + ph * f}" y2="${top + ph * f}"/>`).join("") + `<text x="${W}" y="${top - 3}" text-anchor="end">${fmt(max)}</text>`;
-  items.forEach((d, i) => {
-    const h = d.value ? Math.max(2, (d.value / max) * ph) : 0, x = i * step + (step - bw) / 2, y = top + ph - h, r = Math.min(4, bw / 2, h);
-    if (h) svg += `<path class="bar" data-i="${i}" d="M${x},${y + h}V${y + r}a${r},${r} 0 0 1 ${r},${-r}h${bw - 2 * r}a${r},${r} 0 0 1 ${r},${r}V${y + h}z"/>`;
-    if (i % every === 0) svg += `<text x="${x + bw / 2}" y="${H - 5}" text-anchor="middle">${d.label}</text>`;
-  });
-  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}">${svg}</svg><div class="tip"></div>`;
-  const tip = el.querySelector(".tip"), node = el.querySelector("svg");
-  node.onmousemove = (e) => {
-    const rect = node.getBoundingClientRect();
-    const i = Math.max(0, Math.min(items.length - 1, Math.floor(((e.clientX - rect.left) / rect.width) * items.length)));
-    el.querySelectorAll(".bar").forEach((b) => b.classList.toggle("dim", +b.dataset.i !== i));
-    tip.textContent = `${items[i].label} · ${fmt(items[i].value)}${items[i].unit}`;
-    tip.style.display = "block";
-    tip.style.left = Math.max(50, Math.min(rect.width - 50, ((i + .5) / items.length) * rect.width)) + "px";
-  };
-  node.onmouseleave = () => { tip.style.display = "none"; el.querySelectorAll(".bar").forEach((b) => b.classList.remove("dim")); };
+function ask(title, body, ok, danger) {
+  const d = $("#cf"), b = $("#cf-ok");
+  $("#cf-t").textContent = title; $("#cf-b").textContent = body;
+  b.textContent = ok; b.className = "btn " + (danger ? "danger solid" : "gold");
+  d.returnValue = ""; d.showModal(); b.focus();
+  return new Promise((res) => { d.onclose = () => res(d.returnValue === "ok"); });
 }
 
-const loaders = {
+function theme(t) {
+  R.dataset.theme = t;
+  try { localStorage.setItem("fb-theme", t); } catch {}
+  $$(".th").forEach((b) => { b.innerHTML = icon(t === "dark" ? "sun" : "moon"); b.setAttribute("aria-label", t === "dark" ? "라이트 모드" : "다크 모드"); });
+}
+
+function brand() {
+  const n = cfg?.app_name || "FAMILY";
+  $$(".bn").forEach((e) => (e.textContent = n));
+  D.title = `${n} 관리자`;
+}
+
+function login(msg = "") {
+  $$("dialog[open]").forEach((d) => d.close());
+  $("#shell").hidden = true; $("#login").hidden = false;
+  $("#le").textContent = msg; $("#lp").value = "";
+  setTimeout(() => ($("#lu").value ? $("#lp") : $("#lu")).focus(), 30);
+}
+
+async function enter() {
+  $("#login").hidden = true; $("#shell").hidden = false;
+  try { cfg = await api("/api/settings"); saved = JSON.stringify(cfg); brand(); } catch (e) { if (e.quiet) return; }
+  view = null;
+  show(location.hash.slice(1));
+}
+
+function show(v) {
+  if (!VIEWS.some(([k]) => k === v)) v = "dashboard";
+  view = v;
+  history.replaceState(null, "", "#" + v);
+  $$("#nav button").forEach((b) => { const on = b.dataset.view === v; b.classList.toggle("on", on); on ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current"); });
+  $$(".view").forEach((s) => s.classList.toggle("on", s.id === "v-" + v));
+  $("#save").classList.toggle("on", v === "settings" && dirty());
+  scrollTo(0, 0);
+  load[v]();
+}
+
+function failed(el, e, again) {
+  el.innerHTML = `<div class="panel">${empty("alert", "불러오지 못했습니다", "")}</div>`;
+  $(".empty span", el).textContent = e.message;
+  const b = D.createElement("button");
+  b.className = "btn line sm"; b.type = "button"; b.innerHTML = icon("refresh") + "다시 시도"; b.onclick = again;
+  $(".empty", el).append(b);
+}
+
+function nice(m) {
+  if (m <= 4) return m <= 0 ? 0 : m <= 2 ? 2 : 4;
+  const q = m / 4, p = 10 ** Math.floor(Math.log10(q));
+  return [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10].find((c) => c * p >= q) * p * 4;
+}
+
+function bar(i, x, y0, h, w) {
+  const r = Math.min(3, w / 2, h);
+  return `<path style="--d:${i}" data-i="${i}" d="M${f1(x - w / 2)} ${y0}V${f1(y0 - h + r)}q0 ${-r} ${r} ${-r}h${f1(w - 2 * r)}q${r} 0 ${r} ${r}V${y0}Z"/>`;
+}
+
+function chart(el, o) {
+  const v = o.v, n = v.length, W = el.clientWidth, H = o.h, pt = 22, pb = 22, pw = W - 38, ph = H - pt - pb, y0 = pt + ph;
+  const max = Math.max(0, ...v), top = nice(max), sw = pw / (n || 1), bw = Math.max(2, Math.min(o.bw, sw * .64));
+  const X = (i) => f1((i + .5) * sw), Y = (x) => f1(y0 - (top ? x / top * ph : 0));
+  let s = `<line class="gl b" x2="${pw}" y1="${y0}" y2="${y0}"/>`;
+  if (max) {
+    const pk = v.indexOf(max);
+    [1, .5].forEach((k) => { const y = Y(top * k); s += `<line class="gl" x2="${pw}" y1="${y}" y2="${y}"/><text class="tk" x="${W}" y="${y + 4}" text-anchor="end">${kfmt(top * k)}</text>`; });
+    if (o.avg) s += `<line class="avl" x2="${pw}" y1="${Y(v.reduce((a, b) => a + b, 0) / n)}" y2="${Y(v.reduce((a, b) => a + b, 0) / n)}"/>`;
+    s += `<g class="bars">${v.map((x, i) => (x ? bar(i, X(i), y0, Math.max(2, x / top * ph), bw) : "")).join("")}</g>`;
+    s += `<text class="pk" x="${clamp(X(pk), 18, pw - 18)}" y="${Y(max) - 8}" text-anchor="middle">${o.peak(pk)}</text>`;
+  } else s += `<text class="nil" x="${pw / 2}" y="${pt + ph / 2 + 4}" text-anchor="middle">기록 없음</text>`;
+  o.ticks.forEach(([i, t]) => { s += `<text class="tk" x="${!i ? 0 : i === n - 1 ? pw : X(i)}" y="${H - 4}" text-anchor="${!i ? "start" : i === n - 1 ? "end" : "middle"}">${t}</text>`; });
+  el.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${o.name}">${s}<line class="xh" y1="${pt - 4}" y2="${y0}"/></svg><div class="tip"><span></span><b></b></div>`;
+  if (!n) return;
+  const svg = $("svg", el), xh = $(".xh", el), tip = $(".tip", el), marks = $$(".bars path", el);
+  const at = (e) => {
+    const i = clamp(Math.floor(((e.touches ? e.touches[0] : e).clientX - svg.getBoundingClientRect().left) / sw), 0, n - 1);
+    el.classList.add("hov");
+    marks.forEach((b) => b.classList.toggle("on", +b.dataset.i === i));
+    xh.setAttribute("x1", X(i)); xh.setAttribute("x2", X(i));
+    [tip.firstChild.textContent, tip.lastChild.textContent] = o.tip(i);
+    tip.style.transform = `translateX(${clamp(X(i) - tip.offsetWidth / 2, 0, W - tip.offsetWidth)}px)`;
+  };
+  ["mousemove", "touchstart", "touchmove"].forEach((k) => svg.addEventListener(k, at, { passive: true }));
+  ["mouseleave", "touchend", "touchcancel"].forEach((k) => svg.addEventListener(k, () => el.classList.remove("hov")));
+}
+
+function charts() {
+  if (!dash) return;
+  const d = dash.daily, h = dash.hourly, n = d.length, c = $$("#d-body .chart");
+  if (c.length < 3) return;
+  const wk = Array.from({ length: Math.ceil(n / 7) }, (_, i) => n - 1 - i * 7).map((i) => [i, i === n - 1 ? "오늘" : md(d[i].day)]);
+  const daily = (name, k, un) => ({ name, v: d.map((x) => x[k]), h: 190, bw: 14, avg: 1, peak: (i) => fmt(d[i][k]), ticks: wk, tip: (i) => [md(d[i].day), fmt(d[i][k]) + un] });
+  chart(c[0], daily("일별 채팅", "messages", "회"));
+  chart(c[1], daily("일별 활동 인원", "users", "명"));
+  chart(c[2], { name: "시간대별 채팅", v: h, h: 170, bw: 16, peak: (i) => `${i}시`, ticks: [0, 6, 12, 18, 23].map((i) => [i, `${i}시`]), tip: (i) => [`${i}시`, fmt(h[i]) + "회"] });
+}
+
+const load = {
   async dashboard() {
-    const s = await api("/api/dashboard"), t = s.totals;
-    const tiles = [["💬 오늘 채팅", t.messages_today, "회"], ["🙋 오늘 활동", t.active_today, "명"], ["📈 7일 채팅", t.messages_week, "회"], ["👥 집계 회원", t.members, "명"], ["💰 유통 포인트", t.points, "P"], ["🎟 미사용 이용권", t.tickets, "장"]];
-    $("tiles").innerHTML = tiles.map(([k, v, u]) => `<div class="tile"><div class="k">${k}</div><div class="v">${fmt(v)}<small>${u}</small></div></div>`).join("");
-    const day = (d) => `${+d.slice(5, 7)}.${+d.slice(8)}`;
-    barChart($("cDaily"), s.daily.map((d) => ({ label: day(d.day), value: d.messages, unit: "회" })));
-    barChart($("cUsers"), s.daily.map((d) => ({ label: day(d.day), value: d.users, unit: "명" })));
-    barChart($("cHours"), s.hourly.map((v, h) => ({ label: `${h}시`, value: v, unit: "회" })));
-    $("dashPeriod").textContent = PERIODS[s.period];
-    $("dashRank").innerHTML = s.ranking.map((r, i) => `<tr><td style="width:44px">${MEDALS[i] || i + 1}</td><td>${esc(r.name)}</td><td class="n">${fmt(r.count)}</td></tr>`).join("") || `<tr><td class="hint">집계된 채팅이 없습니다.</td></tr>`;
+    const el = $("#d-body");
+    if (!dash) el.innerHTML = `<div class="sks"><div class="sk" style="height:104px"></div><div class="sk" style="height:280px"></div><div class="sk" style="height:280px"></div></div>`;
+    try { dash = await api("/api/dashboard"); } catch (e) { return e.quiet || failed(el, e, load.dashboard); }
+    if (view !== "dashboard") return;
+    const t = dash.totals, d = dash.daily, n = d.length, td = d[n - 1] || {}, yd = d[n - 2] || {}, sum = (k) => d.reduce((a, x) => a + x[k], 0), avg = (k) => fmt(Math.round(sum(k) / (n || 1)));
+    const diff = (a = 0, b = 0) => (!b ? `어제 ${fmt(b)}` : `<span class="${a >= b ? "pos" : "neg"}">${a >= b ? "▲" : "▼"} ${fmt(Math.round(Math.abs(a - b) / b * 100))}%</span> 어제 대비`);
+    const k = [["오늘 채팅", t.messages_today, "회", diff(td.messages, yd.messages)], ["오늘 활동", t.active_today, "명", diff(td.users, yd.users)],
+      ["7일 채팅", t.messages_week, "회", `7일 활동 ${fmt(t.active_week)}명`], ["회원", t.members, "명", `30일 입장 ${fmt(sum("joins"))} · 퇴장 ${fmt(sum("leaves"))}`],
+      ["유통 포인트", t.points, " P", "회원 보유 합계"], ["미사용 이용권", t.tickets, "장", "룰렛 이용권"]];
+    const hp = dash.hourly.indexOf(Math.max(...dash.hourly)), P = PERIOD[dash.period] || "";
+    const panel = (title, sub, right, cls = "") => `<section class="panel pad ${cls}"><div class="ph"><h2>${title}<small>${sub}</small></h2>${right}</div><div class="chart"></div></section>`;
+    const rank = dash.ranking.length ? dash.ranking.map((r, i) => `<button type="button" class="rr${i < 3 ? " m" + (i + 1) : ""}" data-uid="${r.id}"><span class="rn">${i + 1}</span><span class="av">${esc(mono(r.name))}</span><b>${esc(r.name)}</b><em>${fmt(r.count)}회</em></button>`).join("") : empty("rank", "집계된 채팅 없음", "이 기간에 채팅한 회원이 없습니다.");
+    el.innerHTML = `<div class="panel kpis">${k.map(([a, v, u, s]) => `<div class="kpi"><p class="lab">${a}</p><p class="val" title="${fmt(v)}${u}">${big(v)}<i>${u}</i></p><p class="sub">${s}</p></div>`).join("")}</div>`
+      + `<div class="dash">${panel("일별 채팅", `${n}일`, `<span><i class="key"></i>일평균 <b>${avg("messages")}</b>회</span>`)}`
+      + `<section class="panel pad rk"><div class="ph"><h2>채팅 랭킹<small>${P}</small></h2><span>TOP 10</span></div><div class="rl">${rank}</div></section>`
+      + panel("일별 활동 인원", `${n}일`, `<span><i class="key"></i>일평균 <b>${avg("users")}</b>명</span>`)
+      + panel("시간대별 채팅", `${n}일 합계`, Math.max(...dash.hourly) ? `<span>최다 <b>${hp}시</b></span>` : "") + `</div>`;
+    $("#d-sub").textContent = `${md(td.day || "0000-00-00")} 기준 · 최근 ${n}일`;
+    charts();
   },
   async users() {
-    const r = await api(`/api/users?q=${encodeURIComponent($("uq").value)}&sort=${$("usort").value}&page=${upage}`);
-    $("urows").innerHTML = r.rows.map((u) => `<tr class="click" data-id="${u.user_id}"><td><b>${esc(u.name)}</b></td><td class="hint">${u.username ? "@" + esc(u.username) : "–"}</td><td class="hint">${u.user_id}</td>
-      <td class="n"><b>${fmt(u.points)}</b></td><td class="n">${fmt(u.tickets)}</td><td class="n">${fmt(u.msg_total)}</td><td class="n">${fmt(u.attend_total)}일</td><td class="hint">${u.last_seen.slice(5, 16)}</td></tr>`).join("") || `<tr><td colspan="8" class="hint">회원이 없습니다.</td></tr>`;
-    loaders.users.rows = r.rows;
-    pager("u", upage, r);
+    const el = $("#u-list");
+    if (!pages.users) el.innerHTML = `<div class="empty"><p>불러오는 중</p></div>`;
+    let r;
+    try { r = pages.users = await api(`/api/users?q=${encodeURIComponent(uq)}&sort=${us}&page=${up}`); } catch (e) { return e.quiet || failed(el, e, load.users); }
+    el.innerHTML = r.rows.length ? r.rows.map((u) => `<button type="button" class="trow" data-uid="${u.user_id}"><span class="who"><span class="av">${esc(mono(u.name))}</span><span><b>${esc(u.name)}</b><small>${u.username ? "@" + esc(u.username) + " · " : ""}ID ${u.user_id}</small></span></span>`
+      + `<span class="n" data-l="포인트"><b>${amt(u.points)}</b> P</span><span class="n" data-l="이용권">${fmt(u.tickets)}장</span><span class="n" data-l="채팅">${fmt(u.msg_total)}회</span><span class="n" data-l="출석">${fmt(u.attend_total)}일</span><span class="n c-time muted">${ts(u.last_seen)}</span></button>`).join("")
+      : empty(uq ? "search" : "users", uq ? "검색 결과가 없습니다" : "아직 회원이 없습니다", uq ? "이름, @유저네임 또는 ID로 찾아보세요." : "그룹방에서 채팅한 회원이 여기에 표시됩니다.");
+    pager("u", up, r);
   },
   async logs() {
-    const r = await api(`/api/logs?q=${encodeURIComponent($("lq").value)}&page=${lpage}`);
-    $("lrows").innerHTML = r.rows.map((l) => {
-      const unit = l.kind === "points" ? "P" : l.kind === "tickets" ? "장" : "";
-      const delta = l.reason === "reset" ? "–" : `<span class="${l.delta > 0 ? "up" : "down"}">${l.delta > 0 ? "+" : ""}${fmt(l.delta)} ${unit}</span>`;
-      return `<tr><td class="hint">${l.ts.slice(5, 16)}</td><td>${l.user_id ? esc(l.name || l.user_id) : "전체"}</td><td><span class="tag">${KINDS[l.kind] || l.kind}</span></td><td>${REASONS[l.reason] || esc(l.reason)}</td>
-        <td class="n"><b>${delta}</b></td><td class="n">${l.reason === "reset" ? "0" : fmt(l.balance)}</td><td class="hint">${esc(l.actor)}</td></tr>`;
-    }).join("") || `<tr><td colspan="7" class="hint">내역이 없습니다.</td></tr>`;
-    pager("l", lpage, r);
+    const el = $("#l-list");
+    if (!pages.logs) el.innerHTML = `<div class="empty"><p>불러오는 중</p></div>`;
+    let r;
+    try { r = pages.logs = await api(`/api/logs?q=${encodeURIComponent(lq)}&page=${lp}`); } catch (e) { return e.quiet || failed(el, e, load.logs); }
+    el.innerHTML = r.rows.length ? r.rows.map((l) => {
+      const un = UNIT[l.kind] || "", reset = l.reason === "reset", who = l.user_id ? esc(l.name || l.user_id) : "전체 회원", why = esc(REASON[l.reason] || l.reason);
+      const d = reset ? `<span class="muted">초기화</span>` : `<b class="${l.delta < 0 ? "neg" : "pos"}">${l.delta < 0 ? "−" : "+"}${fmt(Math.abs(l.delta))}${un}</b>`;
+      return `<div class="trow"><span class="c-t muted">${ts(l.ts)}</span><span class="c-who cut"><b>${who}</b></span><span class="c-k"><i class="tag ${esc(l.kind)}">${esc(KIND[l.kind] || l.kind)}</i></span><span class="c-r cut">${why}</span>`
+        + `<span class="n c-d">${d}</span><span class="n c-b">${reset ? "0" + un : fmt(l.balance) + un}</span><span class="c-a cut muted">${esc(l.actor)}</span><span class="c-meta">${why} · ${esc(KIND[l.kind] || l.kind)} · ${ts(l.ts)} · ${esc(l.actor)}</span></div>`;
+    }).join("") : empty(lq ? "search" : "logs", lq ? "검색 결과가 없습니다" : "내역이 없습니다", lq ? "" : "포인트와 이용권 변동이 여기에 기록됩니다.");
+    pager("l", lp, r);
   },
-  async settings() { cfg = await api("/api/settings"); renderSettings(); },
-  async notice() {},
+  async settings() {
+    const el = $("#s-body");
+    if (!cfg || !dirty()) {
+      if (!cfg) el.innerHTML = `<div class="sks"><div class="sk" style="height:150px"></div><div class="sk" style="height:320px"></div></div>`;
+      try { cfg = await api("/api/settings"); saved = JSON.stringify(cfg); brand(); } catch (e) { return e.quiet || failed(el, e, load.settings); }
+    }
+    settings();
+  },
+  notice() { preview(); },
 };
 
 function pager(p, page, r) {
-  const pages = Math.max(1, Math.ceil(r.total / r.page_size));
-  $(p + "info").textContent = `${fmt(r.total)}건 · ${page + 1} / ${pages}`;
-  $(p + "prev").disabled = page === 0; $(p + "next").disabled = page >= pages - 1;
+  const total = r.total, size = r.page_size, last = Math.max(0, Math.ceil(total / size) - 1);
+  $(`#${p}-info`).textContent = `${fmt(total)}${p === "u" ? "명" : "건"}`;
+  $(`#${p}-page`).textContent = total ? `${fmt(page * size + 1)}–${fmt(Math.min(total, (page + 1) * size))} / ${fmt(total)}` : "";
+  $(`#${p}-prev`).disabled = page <= 0;
+  $(`#${p}-next`).disabled = page >= last;
 }
 
-function renderSettings() {
-  $("sPeriod").value = cfg.ranking_period; $("sAttend").value = cfg.attend_points; $("sCache").value = cfg.sports_cache_sec;
-  $("sRoulette").checked = cfg.roulette_enabled; $("sRouletteLabel").textContent = cfg.roulette_enabled ? "켜짐 · 미니앱에 표시" : "꺼짐 · 미니앱에서 숨김";
-  const sum = cfg.roulette_slots.reduce((a, s) => a + (+s.weight || 0), 0);
-  $("slots").innerHTML = cfg.roulette_slots.map((s, i) => `<div class="slot"><input type="number" min="0" data-slot="${i}" data-f="points" value="${s.points}"><input type="number" min="0" data-slot="${i}" data-f="weight" value="${s.weight}">
-    <span class="hint">${sum ? ((s.weight / sum) * 100).toFixed(1) : "0"}%</span><button class="ghost" data-del-slot="${i}">✕</button></div>`).join("");
-  $("leagues").innerHTML = Object.entries(SPORTS).map(([k, label]) => `<div><h2>${label}</h2>${(cfg.leagues[k] || []).map((l, i) => `<div class="league"><input type="number" data-lg="${k}" data-i="${i}" data-f="id" value="${l.id}"><input data-lg="${k}" data-i="${i}" data-f="name" value="${esc(l.name)}"><button class="ghost" data-del-lg="${k}" data-i="${i}">✕</button></div>`).join("") || `<div class="hint">등록된 리그가 없습니다. 아래에서 검색해 추가하세요.</div>`}</div>`).join("");
-  $("lsSport").innerHTML = $("lsSport").innerHTML || Object.entries(SPORTS).map(([k, v]) => `<option value="${k}">${v}</option>`).join("");
+function amount() {
+  const v = parseInt(($("#a-amt").value || "").replace(/[^\d]/g, ""), 10);
+  return v > 0 && v <= 1e12 ? v : 0;
 }
 
-function show(view) {
-  document.querySelectorAll("main section").forEach((s) => (s.hidden = s.dataset.view !== view));
-  document.querySelectorAll("#nav [data-view]").forEach((b) => b.classList.toggle("on", b.dataset.view === view));
-  run(loaders[view])();
+function adjView() {
+  const have = cur[kind], un = UNIT[kind], a = amount();
+  $("#a-pts").textContent = big(cur.points) + " P"; $("#a-tix").textContent = big(cur.tickets) + "장";
+  $("#a-pts").title = fmt(cur.points) + " P"; $("#a-tix").title = fmt(cur.tickets) + "장";
+  $("#a-unit").textContent = un.trim();
+  $$("#a-kind button").forEach((b) => b.classList.toggle("on", b.dataset.k === kind));
+  $("#a-chips").innerHTML = (kind === "points" ? [100, 1000, 10000, 100000] : [1, 5, 10]).map((x) => `<button type="button" data-add="${x}">+${fmt(x)}</button>`).join("");
+  $("#a-pv").innerHTML = a ? `지급 후 <b>${fmt(have + a)}${un}</b> · 회수 후 <b>${fmt(Math.max(0, have - a))}${un}</b>` : "수량을 입력하세요.";
+  $("#a-give").disabled = $("#a-take").disabled = !a;
+  $("#a-take").disabled ||= !have;
 }
 
 function openUser(u) {
-  current = u;
-  $("dName").textContent = u.name;
-  $("dMeta").textContent = `${u.username ? "@" + u.username + " · " : ""}ID ${u.user_id} · ${fmt(u.points)} P · 이용권 ${fmt(u.tickets)}장`;
-  $("dAmount").value = "";
-  $("dlg").showModal();
+  cur = { ...u }; kind = "points";
+  $("#a-av").textContent = mono(u.name);
+  $("#a-name").textContent = u.name;
+  $("#a-meta").textContent = `${u.username ? "@" + u.username + " · " : ""}ID ${u.user_id}`;
+  $("#a-amt").value = "";
+  adjView();
+  $("#adj").showModal();
+  $("#a-amt").focus();
 }
 
-const adjust = (sign) => run(async () => {
-  const amount = parseInt($("dAmount").value, 10);
-  if (!(amount > 0)) return toast("수량을 입력하세요.");
-  const kind = $("dKind").value;
-  const r = await api(`/api/users/${current.user_id}/adjust`, "POST", { kind, delta: sign * amount });
-  toast(`${KINDS[kind]} ${r.applied > 0 ? "+" : ""}${fmt(r.applied)} · 잔여 ${fmt(r.balance)}`);
-  $("dlg").close();
-  await loaders.users();
+const findUser = safe(async (id) => {
+  const r = await api(`/api/users?q=${id}`), u = r.rows.find((x) => x.user_id === id);
+  if (u) openUser(u); else toast("회원을 찾을 수 없습니다.", 1);
 });
 
-$("loginForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
+const adjust = safe(async (sign) => {
+  const a = amount();
+  if (!a) return;
+  $("#a-give").disabled = $("#a-take").disabled = true;
   try {
-    await api("/api/login", "POST", { username: $("lu").value, password: $("lp").value });
-    $("lp").value = ""; $("loginError").textContent = "";
-    $("login").hidden = true; $("shell").hidden = false; show("dashboard");
-  } catch (err) { $("loginError").textContent = err.message; }
+    const r = await api(`/api/users/${cur.user_id}/adjust`, "POST", { kind, delta: sign * a }), un = UNIT[kind];
+    cur[kind] = r.balance;
+    $("#adj").close();
+    toast(r.applied ? `${KIND[kind]} ${r.applied > 0 ? "+" : "−"}${fmt(Math.abs(r.applied))}${un} · 잔액 ${fmt(r.balance)}${un}` : "회수할 수량이 없습니다.");
+    if (view === "users") load.users(); else if (view === "dashboard") load.dashboard();
+  } finally { adjView(); }
 });
-$("logout").onclick = run(async () => { await api("/api/logout", "POST"); showLogin(); });
-$("nav").addEventListener("click", (e) => { const b = e.target.closest("[data-view]"); if (b) show(b.dataset.view); });
 
-const settingsView = document.querySelector('section[data-view="settings"]');
-let timer;
-const debounce = (fn) => () => { clearTimeout(timer); timer = setTimeout(fn, 250); };
-$("uq").oninput = debounce(() => { upage = 0; run(loaders.users)(); });
-$("usort").onchange = () => { upage = 0; run(loaders.users)(); };
-$("uprev").onclick = () => { upage--; run(loaders.users)(); };
-$("unext").onclick = () => { upage++; run(loaders.users)(); };
-$("lq").oninput = debounce(() => { lpage = 0; run(loaders.logs)(); });
-$("lprev").onclick = () => { lpage--; run(loaders.logs)(); };
-$("lnext").onclick = () => { lpage++; run(loaders.logs)(); };
-$("urows").addEventListener("click", (e) => { const tr = e.target.closest("tr[data-id]"); if (tr) openUser(loaders.users.rows.find((u) => u.user_id == tr.dataset.id)); });
-$("dGive").onclick = adjust(1); $("dTake").onclick = adjust(-1); $("dClose").onclick = () => $("dlg").close();
+const dirty = () => !!cfg && JSON.stringify(cfg) !== saved;
+const mark = () => $("#save").classList.toggle("on", view === "settings" && dirty());
 
-settingsView.addEventListener("input", (e) => {
+function settings() {
+  const el = $("#s-body"), c = cfg;
+  el.innerHTML = `<section class="panel pad sec"><div class="ph"><h2>기본</h2></div><p class="desc">미니앱 카드와 봇 안내에 표시되는 이름입니다.</p>
+    <div class="grid2"><label class="fld"><span>브랜드 이름</span><input data-k="app_name" maxlength="24" value="${esc(c.app_name)}"></label></div></section>`
+    + `<section class="panel pad sec"><div class="ph"><h2>랭킹 · 출석</h2></div><p class="desc">/랭킹 과 미니앱 기본 탭의 집계 기간, /출석 한 번에 지급하는 포인트입니다.</p>
+    <div class="grid2"><div class="fld"><span>랭킹 기간</span><div class="seg" id="s-period">${Object.entries(PERIOD).map(([k, v]) => `<button type="button" data-period="${k}" class="${c.ranking_period === k ? "on" : ""}">${v}</button>`).join("")}</div></div>
+    <label class="fld"><span>출석 보상</span><span class="inp"><input data-k="attend_points" data-num inputmode="numeric" value="${c.attend_points}"><em>P</em></span></label></div></section>`
+    + `<section class="panel pad sec${c.roulette_enabled ? "" : " off"}" id="s-rl"><div class="ph"><h2>룰렛</h2><label class="sw"><input type="checkbox" id="s-on"${c.roulette_enabled ? " checked" : ""}><span id="s-onl">${c.roulette_enabled ? "사용" : "사용 안 함"}</span></label></div>
+    <p class="desc">끄면 미니앱에서 룰렛 탭과 이용권 표시가 사라집니다. 칸은 2~12개, 가중치 비율대로 당첨됩니다.</p><div class="slots" id="slots"></div></section>`
+    + `<section class="panel pad sec"><div class="ph"><h2>경기</h2></div><p class="desc">/경기 에 표시할 리그입니다. ID는 API-Sports 리그 번호입니다.</p>
+    <div class="grid2"><label class="fld"><span>갱신 간격</span><span class="inp"><input data-k="sports_cache_sec" data-num inputmode="numeric" value="${c.sports_cache_sec}"><em>초</em></span></label></div>
+    <div class="lg-grid" id="lgs"></div>
+    <div class="find"><h2>리그 검색</h2><form id="find"><div class="seg" id="s-sport">${Object.entries(SPORT).map(([k, v]) => `<button type="button" data-sport="${k}" class="${sport === k ? "on" : ""}">${v}</button>`).join("")}</div>
+    <div class="inp">${icon("search")}<input id="fq" placeholder="영문 3글자 이상 (예: korea, premier)" autocomplete="off"></div><button class="btn line" id="fb">검색</button></form><div class="res" id="res"></div></div></section>`
+    + `<section class="panel pad sec danger-zone"><div class="ph"><h2>초기화</h2></div><p class="desc">전체 회원에게 즉시 적용되며 되돌릴 수 없습니다.</p>
+    <div class="acts"><button type="button" class="btn danger" data-reset="points">전체 포인트 초기화</button><button type="button" class="btn danger" data-reset="tickets">전체 이용권 초기화</button><button type="button" class="btn danger" data-reset="chat">채팅 횟수 초기화</button></div></section>`;
+  slots(); leagues(); results(); mark();
+}
+
+function slots() {
+  const s = cfg.roulette_slots, w = s.reduce((a, x) => a + (+x.weight || 0), 0), ev = w ? s.reduce((a, x) => a + x.points * x.weight, 0) / w : 0;
+  $("#slots").innerHTML = `<div class="sl-h"><span></span><span>당첨 포인트</span><span>가중치</span><span>확률</span><span></span></div>`
+    + s.map((x, i) => `<div class="slot"><span class="no">${i + 1}</span><span class="inp"><input data-slot="${i}" data-f="points" inputmode="numeric" value="${x.points}" aria-label="${i + 1}번 칸 포인트"><em>${x.points ? "P" : "꽝"}</em></span><input data-slot="${i}" data-f="weight" inputmode="numeric" value="${x.weight}" aria-label="${i + 1}번 칸 가중치"><span class="prob"><i style="--w:${w ? x.weight / w * 100 : 0}%"></i><b>${w ? (x.weight / w * 100).toFixed(1) : "0.0"}%</b></span><button type="button" class="ib del" data-del-slot="${i}" aria-label="${i + 1}번 칸 삭제"${s.length <= 2 ? " disabled" : ""}>${icon("trash")}</button></div>`).join("")
+    + `<div class="acts"><button type="button" class="btn line sm" id="slot-add"${s.length >= 12 ? " disabled" : ""}>${icon("plus")}칸 추가</button><span>1회 기대값 <b>${fmt(Math.round(ev))} P</b>${w ? "" : " · 가중치 합이 0입니다"}</span></div>`;
+}
+
+function probs() {
+  const s = cfg.roulette_slots, w = s.reduce((a, x) => a + (+x.weight || 0), 0), ev = w ? s.reduce((a, x) => a + x.points * x.weight, 0) / w : 0;
+  $$("#slots .slot").forEach((row, i) => {
+    const p = w ? s[i].weight / w * 100 : 0;
+    $(".prob i", row).style.setProperty("--w", p + "%"); $(".prob b", row).textContent = p.toFixed(1) + "%";
+    $(".inp em", row).textContent = s[i].points ? "P" : "꽝";
+  });
+  $("#slots .acts span").innerHTML = `1회 기대값 <b>${fmt(Math.round(ev))} P</b>${w ? "" : " · 가중치 합이 0입니다"}`;
+}
+
+function leagues() {
+  $("#lgs").innerHTML = Object.entries(SPORT).map(([k, v]) => {
+    const list = cfg.leagues[k] || [];
+    return `<div class="lgc"><h3>${v}<small>${list.length}개</small></h3>` + (list.length ? list.map((l, i) => `<div class="lgr"><input data-lg="${k}" data-i="${i}" data-f="id" inputmode="numeric" value="${l.id}" aria-label="리그 ID"><input data-lg="${k}" data-i="${i}" data-f="name" maxlength="40" value="${esc(l.name)}" aria-label="표시 이름"><button type="button" class="ib del" data-del-lg="${k}" data-i="${i}" aria-label="삭제">${icon("trash")}</button></div>`).join("") : `<p class="none">등록된 리그가 없습니다.</p>`) + `</div>`;
+  }).join("");
+}
+
+function results() {
+  const el = $("#res");
+  if (!el) return;
+  const have = new Set((cfg.leagues[sport] || []).map((l) => l.id));
+  el.innerHTML = found.map((l, i) => `<div class="rr"><span class="id">${l.id}</span><span><b>${esc(l.name)}</b><small>${esc(l.country)}</small></span><button type="button" class="btn ${have.has(l.id) ? "line" : "gold"} sm" data-pick="${i}"${have.has(l.id) ? " disabled" : ""}>${have.has(l.id) ? "추가됨" : "추가"}</button></div>`).join("");
+}
+
+const search = safe(async () => {
+  const q = $("#fq").value.trim(), el = $("#res");
+  if (q.length < 3) return toast("검색어는 영문 3글자 이상 입력하세요.", 1);
+  $("#fb").disabled = true; el.innerHTML = `<p class="muted" style="padding:10px 0">검색 중</p>`;
+  try { found = (await api(`/api/leagues/search?sport=${sport}&q=${encodeURIComponent(q)}`)).slice(0, 30); }
+  catch (e) { found = []; el.innerHTML = ""; throw e; }
+  finally { $("#fb").disabled = false; }
+  results();
+  if (!found.length) el.innerHTML = `<p class="muted" style="padding:10px 0">검색 결과가 없습니다.</p>`;
+});
+
+const save = safe(async () => {
+  const c = cfg;
+  if (!c.app_name.trim()) return toast("브랜드 이름을 입력하세요.", 1);
+  if (!c.roulette_slots.reduce((a, x) => a + x.weight, 0)) return toast("룰렛 가중치의 합이 0입니다.", 1);
+  if (Object.values(c.leagues).some((l) => l.some((x) => !String(x.name).trim()))) return toast("리그 이름을 입력하세요.", 1);
+  $("#s-save").disabled = true;
+  try { cfg = await api("/api/settings", "PUT", c); saved = JSON.stringify(cfg); }
+  finally { $("#s-save").disabled = false; }
+  brand(); settings(); dash = null; toast("저장했습니다.");
+});
+
+const reset = safe(async (k) => {
+  const label = { points: "전체 포인트 초기화", tickets: "전체 이용권 초기화", chat: "채팅 횟수 초기화" }[k];
+  const body = { points: "모든 회원의 포인트가 0이 됩니다.", tickets: "모든 회원의 이용권이 0장이 됩니다.", chat: "랭킹과 통계의 채팅 기록이 모두 삭제됩니다." }[k];
+  if (!(await ask(label, body + " 되돌릴 수 없습니다.", "초기화", true))) return;
+  const r = await api("/api/reset/" + k, "POST");
+  dash = null; pages.users = pages.logs = null;
+  toast(`${label} 완료 · ${fmt(r.affected)}명`);
+});
+
+function tgHtml(src) {
+  return esc(src)
+    .replace(/&#60;(\/?)(b|strong|i|em|u|ins|s|strike|del|code|pre|blockquote|tg-spoiler)&#62;/g, "<$1$2>")
+    .replace(/&#60;blockquote expandable&#62;/g, "<blockquote>")
+    .replace(/&#60;a href=&#34;(https?:\/\/[^\s<>]*?)&#34;&#62;/g, '<a href="$1" target="_blank" rel="noopener noreferrer">')
+    .replace(/&#60;\/a&#62;/g, "</a>");
+}
+
+function preview() {
+  const t = $("#nt").value, n = [...t].length, now = new Date();
+  $("#nc").textContent = `${fmt(n)} / 4,000`;
+  $("#ns").disabled = !t.trim();
+  $("#nv").innerHTML = `<b>📢 공지</b>\n\n${t.trim() ? tgHtml(t) : `<span class="muted">내용을 입력하면 여기에 표시됩니다.</span>`}<time>${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}</time>`;
+}
+
+function wrap(tag) {
+  const ta = $("#nt"), a = ta.selectionStart, b = ta.selectionEnd, sel = ta.value.slice(a, b);
+  const open = tag === "a" ? '<a href="https://">' : `<${tag}>`, close = `</${tag}>`;
+  ta.setRangeText(open + sel + close, a, b, "end");
+  if (tag === "a") ta.setSelectionRange(a + 9, a + 17); else if (!sel) ta.setSelectionRange(a + open.length, a + open.length);
+  ta.focus(); preview();
+}
+
+const send = safe(async () => {
+  const text = $("#nt").value.trim(), pin = $("#np").checked;
+  if (!text) return;
+  if (!(await ask("공지 보내기", `그룹방에 공지를 보냅니다${pin ? " (상단 고정)" : ""}.`, "보내기"))) return;
+  $("#ns").disabled = true;
+  try { await api("/api/notice", "POST", { text, pin }); }
+  catch (e) {
+    if (e.status !== 502) throw e;
+    $("#nt").value = ""; preview();
+    return toast(e.message, 1);
+  } finally { preview(); }
+  $("#nt").value = ""; $("#np").checked = false; preview();
+  toast("그룹방에 보냈습니다.");
+});
+
+$("#nav").innerHTML = VIEWS.map(([k, v]) => `<button type="button" data-view="${k}">${icon(k)}<span>${v}</span></button>`).join("");
+$("#nav").onclick = (e) => { const b = e.target.closest("button"); if (b) show(b.dataset.view); };
+$$(".lo").forEach((b) => { if (!b.textContent) b.innerHTML = icon("logout"); b.onclick = safe(async () => { await api("/api/logout", "POST"); cfg = null; saved = ""; dash = null; login("로그아웃했습니다."); }); });
+$$(".th").forEach((b) => (b.onclick = () => theme(R.dataset.theme === "dark" ? "light" : "dark")));
+theme(R.dataset.theme === "light" ? "light" : "dark");
+
+$("#lf").onsubmit = async (e) => {
+  e.preventDefault();
+  const u = $("#lu").value.trim(), p = $("#lp").value, b = $("#lb");
+  if (!u || !p) { $("#le").textContent = "아이디와 비밀번호를 입력하세요."; return (u ? $("#lp") : $("#lu")).focus(); }
+  b.disabled = true;
+  try { await api("/api/login", "POST", { username: u, password: p }); $("#le").textContent = ""; enter(); }
+  catch (err) { $("#le").textContent = err.message; $("#lp").select(); }
+  finally { b.disabled = false; }
+};
+
+$("#d-body").onclick = (e) => { const b = e.target.closest("[data-uid]"); if (b) findUser(+b.dataset.uid); };
+let tq;
+$("#uq").oninput = () => { clearTimeout(tq); tq = setTimeout(() => { uq = $("#uq").value.trim(); up = 0; load.users(); }, 250); };
+$("#uq").onkeydown = (e) => { if (e.key === "Enter") { clearTimeout(tq); uq = $("#uq").value.trim(); up = 0; load.users(); } };
+$("#us").onclick = (e) => { const b = e.target.closest("button"); if (!b || b.dataset.sort === us) return; us = b.dataset.sort; up = 0; $$("#us button").forEach((x) => x.classList.toggle("on", x === b)); load.users(); };
+$("#u-prev").onclick = () => { up--; load.users(); };
+$("#u-next").onclick = () => { up++; load.users(); };
+$("#u-list").onclick = (e) => { const b = e.target.closest("[data-uid]"); if (b) openUser(pages.users.rows.find((u) => u.user_id === +b.dataset.uid)); };
+let tl;
+$("#lq").oninput = () => { clearTimeout(tl); tl = setTimeout(() => { lq = $("#lq").value.trim(); lp = 0; load.logs(); }, 250); };
+$("#lq").onkeydown = (e) => { if (e.key === "Enter") { clearTimeout(tl); lq = $("#lq").value.trim(); lp = 0; load.logs(); } };
+$("#l-prev").onclick = () => { lp--; load.logs(); };
+$("#l-next").onclick = () => { lp++; load.logs(); };
+
+$("#adj").onclick = (e) => {
+  if (e.target === $("#adj") || e.target.closest("[data-close]")) return $("#adj").close();
+  const k = e.target.closest("[data-k]"), add = e.target.closest("[data-add]");
+  if (k) { kind = k.dataset.k; adjView(); $("#a-amt").focus(); }
+  if (add) { $("#a-amt").value = fmt(amount() + +add.dataset.add); adjView(); }
+};
+$("#a-amt").oninput = () => { const a = amount(); if (a) $("#a-amt").value = fmt(a); adjView(); };
+$("#a-give").onclick = () => adjust(1);
+$("#a-take").onclick = () => adjust(-1);
+$("#cf").onclick = (e) => { if (e.target === $("#cf")) $("#cf").close(); };
+
+const S = $("#v-settings");
+S.addEventListener("input", (e) => {
   const t = e.target;
-  if (t.dataset.slot !== undefined) cfg.roulette_slots[t.dataset.slot][t.dataset.f] = parseInt(t.value, 10) || 0;
-  if (t.dataset.lg) cfg.leagues[t.dataset.lg][t.dataset.i][t.dataset.f] = t.dataset.f === "id" ? parseInt(t.value, 10) || 0 : t.value;
-  if (t.id === "sRoulette") { cfg.roulette_enabled = t.checked; renderSettings(); }
+  if (t.dataset.k) cfg[t.dataset.k] = "num" in t.dataset ? parseInt(t.value.replace(/[^\d]/g, ""), 10) || 0 : t.value;
+  if (t.dataset.slot) { cfg.roulette_slots[t.dataset.slot][t.dataset.f] = parseInt(t.value.replace(/[^\d]/g, ""), 10) || 0; probs(); }
+  if (t.dataset.lg) { const l = cfg.leagues[t.dataset.lg][t.dataset.i]; l[t.dataset.f] = t.dataset.f === "id" ? parseInt(t.value.replace(/[^\d]/g, ""), 10) || 0 : t.value; }
+  if (t.id === "s-on") { cfg.roulette_enabled = t.checked; $("#s-rl").classList.toggle("off", !t.checked); $("#s-onl").textContent = t.checked ? "사용" : "사용 안 함"; }
+  mark();
 });
-settingsView.addEventListener("change", (e) => { if (e.target.dataset.slot !== undefined) renderSettings(); });
-settingsView.addEventListener("click", run(async (e) => {
-  const t = e.target.closest("button"); if (!t) return;
-  if (t.dataset.delSlot !== undefined) { cfg.roulette_slots.splice(t.dataset.delSlot, 1); renderSettings(); }
-  if (t.dataset.delLg) { cfg.leagues[t.dataset.delLg].splice(t.dataset.i, 1); renderSettings(); }
-  if (t.dataset.add) { const [sport, id, name] = JSON.parse(t.dataset.add); (cfg.leagues[sport] ||= []).push({ id, name }); renderSettings(); toast("추가했습니다. 저장해야 적용됩니다."); }
-  if (t.dataset.reset) {
-    const label = t.textContent.trim();
-    if (!confirm(`${label}를 실행할까요? 되돌릴 수 없습니다.`)) return;
-    const r = await api(`/api/reset/${t.dataset.reset}`, "POST");
-    toast(`${label} 완료 · ${fmt(r.affected)}명`);
-  }
-}));
-$("addSlot").onclick = () => { cfg.roulette_slots.push({ points: 0, weight: 1 }); renderSettings(); };
-$("lsGo").onclick = run(async () => {
-  const sport = $("lsSport").value;
-  const rows = await api(`/api/leagues/search?sport=${sport}&q=${encodeURIComponent($("lsQuery").value)}`);
-  $("lsRows").innerHTML = rows.map((l) => `<tr><td class="hint">${l.id}</td><td><b>${esc(l.name)}</b></td><td class="hint">${esc(l.country)}</td><td class="n"><button data-add="${esc(JSON.stringify([sport, l.id, l.name]))}">추가</button></td></tr>`).join("") || `<tr><td class="hint">검색 결과가 없습니다.</td></tr>`;
+S.addEventListener("click", (e) => {
+  const t = e.target.closest("button");
+  if (!t) return;
+  if (t.dataset.period) { cfg.ranking_period = t.dataset.period; $$("#s-period button").forEach((b) => b.classList.toggle("on", b === t)); }
+  else if (t.id === "slot-add") { cfg.roulette_slots.push({ points: 0, weight: 1 }); slots(); }
+  else if (t.dataset.delSlot) { cfg.roulette_slots.splice(+t.dataset.delSlot, 1); slots(); }
+  else if (t.dataset.delLg) { cfg.leagues[t.dataset.delLg].splice(+t.dataset.i, 1); leagues(); results(); }
+  else if (t.dataset.sport) { sport = t.dataset.sport; found = []; $$("#s-sport button").forEach((b) => b.classList.toggle("on", b === t)); results(); $("#fq").focus(); }
+  else if (t.dataset.pick) { const l = found[+t.dataset.pick]; (cfg.leagues[sport] ||= []).push({ id: l.id, name: l.name }); leagues(); results(); toast(`${SPORT[sport]} · ${l.name} 추가`); }
+  else if (t.dataset.reset) reset(t.dataset.reset);
+  mark();
 });
-$("save").onclick = run(async () => {
-  cfg.ranking_period = $("sPeriod").value; cfg.attend_points = parseInt($("sAttend").value, 10) || 0; cfg.sports_cache_sec = parseInt($("sCache").value, 10) || 180;
-  cfg = await api("/api/settings", "PUT", cfg); renderSettings(); toast("저장했습니다.");
-});
-$("nSend").onclick = run(async () => {
-  const text = $("nText").value.trim();
-  if (!text) return toast("내용을 입력하세요.");
-  await api("/api/notice", "POST", { text, pin: $("nPin").checked });
-  $("nText").value = ""; toast("그룹방에 보냈습니다.");
-});
+S.addEventListener("submit", (e) => { e.preventDefault(); search(); });
+$("#s-save").onclick = save;
+$("#s-undo").onclick = () => { cfg = JSON.parse(saved); settings(); };
+
+$("#nt").oninput = preview;
+$("#tb").onclick = (e) => { const b = e.target.closest("[data-w]"); if (b) wrap(b.dataset.w); };
+$("#ns").onclick = send;
+
+addEventListener("beforeunload", (e) => { if (dirty()) e.preventDefault(); });
+addEventListener("resize", () => { if (innerWidth === width) return; width = innerWidth; clearTimeout(tq); if (view === "dashboard") charts(); });
 
 (async () => {
-  const s = await api("/api/session");
-  if (s.authed) { $("shell").hidden = false; show("dashboard"); } else showLogin();
+  try { (await api("/api/session")).authed ? enter() : login(); }
+  catch (e) { login(e.message); }
+})();
 })();
 </script>
 </body>

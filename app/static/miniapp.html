@@ -52,7 +52,7 @@ h2 small{margin-left:7px;font-size:12.5px;font-weight:500;letter-spacing:0;color
 .mark span{overflow:hidden;text-overflow:ellipsis}
 .ava{display:grid;place-items:center;flex:none;width:40px;height:40px;overflow:hidden;border:1.5px solid transparent;border-radius:50%;background:linear-gradient(#1C1914,#1C1914) padding-box,var(--metal) border-box;font-size:15px;font-weight:600;line-height:1;color:#D8BD84}
 .ava img{width:100%;height:100%;object-fit:cover}
-.eng{font-size:9px;font-weight:600;letter-spacing:.24em;color:rgba(243,237,224,.54)}
+.eng{font-size:10.5px;font-weight:600;letter-spacing:.2em;color:rgba(243,237,224,.72)}
 .card>.c-mid{flex-direction:column;gap:4px}
 .bal{margin-left:-.04em;padding-bottom:.04em;overflow:hidden;font-size:44px;line-height:1.1;font-weight:600;letter-spacing:-.035em;white-space:nowrap}
 .bal i{margin-left:.2em;font-size:.4em;font-weight:600;letter-spacing:0;color:#D8BD84}
@@ -62,16 +62,20 @@ h2 small{margin-left:7px;font-size:12.5px;font-weight:500;letter-spacing:0;color
 .who b{font-size:14.5px;font-weight:600;letter-spacing:.01em;text-shadow:0 1px 0 rgba(0,0,0,.7)}
 .who span{font-size:12px;color:var(--text2)}
 .since{flex:none;text-align:right}
-.since .eng{margin-right:-.24em}
+.since .eng{margin-right:-.2em}
 .since span{display:block;margin-top:3px;font-size:12.5px;letter-spacing:.06em}
 
 .strip{display:grid;grid-auto-columns:minmax(0,1fr);grid-auto-flow:column;padding:0}
 .cell{min-width:0;padding:15px 14px 14px}
+button.cell{display:block;width:100%;text-align:left;transition:background-color .2s}
+button.cell:active{background-color:var(--wash)}
+.lab,.val,.sub{display:block}
 .cell+.cell{border-left:1px solid var(--line)}
 .lab{overflow:hidden;font-size:12px;color:var(--text2);white-space:nowrap;text-overflow:ellipsis}
 .val{margin-top:5px;overflow:hidden;font-size:22px;line-height:1.2;font-weight:600;letter-spacing:-.025em;white-space:nowrap}
 .val i{margin-left:.14em;font-size:.57em;font-weight:500;letter-spacing:0;color:var(--text2)}
 .sub{margin-top:3px;overflow:hidden;font-size:11.5px;color:var(--text3);white-space:nowrap;text-overflow:ellipsis}
+.sub.go{font-weight:600;color:var(--gold-ink)}
 
 .chip{display:inline-flex;align-items:center;align-self:center;gap:4px;height:26px;padding:0 10px 0 7px;border-radius:13px;background:var(--wash);box-shadow:inset 0 0 0 1px var(--edge);font-size:12px;font-weight:600;color:var(--gold-ink)}
 .chip .ic{width:14px;height:14px;stroke-width:2}
@@ -97,21 +101,17 @@ h2 small{margin-left:7px;font-size:12.5px;font-weight:500;letter-spacing:0;color
 .chart svg{display:block;overflow:visible}
 .gl{stroke:var(--line)}
 .gl.b{stroke:var(--line2)}
-.avl{stroke:var(--text3);opacity:.8}
+.avl{stroke:var(--text3);stroke-dasharray:2 3}
+.key{display:inline-block;width:12px;margin-right:6px;border-top:1.5px dashed var(--text3);vertical-align:middle}
 .tk{font-size:10.5px;fill:var(--text3)}
 .pk{font-size:10.5px;font-weight:600;fill:var(--text2);stroke:var(--surface);stroke-width:5px;stroke-linejoin:round;paint-order:stroke}
 .nil{font-size:12px;fill:var(--text3)}
 .bars path{fill:url(#gBar);transform-box:fill-box;transform-origin:50% 100%;animation:grow .8s var(--ease) both;animation-delay:calc(var(--d)*16ms)}
 .bars.dn path{fill:var(--text3);transform-origin:50% 0}
 @keyframes grow{from{transform:scaleY(0)}}
-.ln{fill:none;stroke:var(--gold);stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
-.ar{fill:url(#gArea)}
-.ar,.ln,.end{animation:fade 1s .15s var(--ease) both}
-.dot{fill:var(--gold);stroke:var(--surface);stroke-width:2}
-.xh{stroke:var(--line2)}
-.xh,.xd{opacity:0}
-.scrub .xh,.scrub .xd{opacity:1}
-.scrub .pk,.scrub .end{opacity:0}
+.xh{stroke:var(--line2);opacity:0}
+.scrub .xh{opacity:1}
+.scrub .pk{opacity:0}
 .scrub .bars path{opacity:.34}
 .scrub .bars path.on{opacity:1}
 .tip{position:absolute;top:-10px;left:0;display:flex;align-items:baseline;gap:6px;padding:5px 9px;border-radius:9px;background:var(--elev);box-shadow:inset 0 0 0 1px var(--line2),var(--float);font-size:11.5px;color:var(--text2);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s}
@@ -133,6 +133,9 @@ h2 small{margin-left:7px;font-size:12.5px;font-weight:500;letter-spacing:0;color
 .rm b{font-size:14.5px;font-weight:600}
 .rm span{font-size:12px;color:var(--text3)}
 .row em{flex:none;font-size:15px;font-weight:600;letter-spacing:-.01em}
+.ra{flex:none;max-width:60%;text-align:right}
+.ra em,.ra span{display:block;white-space:nowrap}
+.ra span{font-size:12px;color:var(--text3)}
 .pos{color:var(--pos)}
 .neg{color:var(--neg)}
 .gold{color:var(--gold-ink)}
@@ -204,6 +207,8 @@ h2 small{margin-left:7px;font-size:12.5px;font-weight:500;letter-spacing:0;color
 .t-tint{fill:#EAD9AA}
 .hit{fill:rgba(246,234,200,.14);stroke:#F6EAC8;stroke-width:1.5;stroke-linejoin:round;opacity:0}
 .hit.on{animation:hit 1.5s ease-out both}
+#disc [data-i]{transition:opacity .6s}
+#disc.done [data-i]:not(.win){opacity:.36}
 @keyframes hit{0%{opacity:0}18%{opacity:1}36%{opacity:.3}58%{opacity:1}to{opacity:.85}}
 .ro{display:flex;flex-direction:column;align-items:center;min-height:84px;margin-top:16px;text-align:center}
 .ro-l{font-size:12px;font-weight:600;letter-spacing:.04em;color:var(--text2)}
@@ -252,13 +257,13 @@ h2 small{margin-left:7px;font-size:12.5px;font-weight:500;letter-spacing:0;color
 #fx i:nth-child(2n){background:#C9A96A}
 #fx i:nth-child(3n){width:4px;height:4px;border-radius:50%;background:#F6EAC8;clip-path:none}
 #fx b{position:absolute;border-radius:50%;box-shadow:inset 0 0 0 1.5px var(--gold)}
+.party .top,.party .ro{position:relative;z-index:41}
 @media(max-width:350px){:root{--g:16px}.panel{padding:16px}.card,.sk-c{aspect-ratio:1.5;padding:18px 18px 17px}.bal{font-size:36px}.strip{padding:0}.cell{padding:14px 12px 13px}.kpi .cell{padding:14px 14px 13px}.val{font-size:20px}.list{padding:14px 16px 4px}.rows{padding:6px 16px}.row.me{margin:0 -16px;padding:9px 16px}.cta{height:52px}.ro{min-height:78px;margin-top:12px}.ro-v{font-size:28px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
 <svg class="defs" aria-hidden="true"><defs>
-<linearGradient id="gArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--gold);stop-opacity:.26"/><stop offset="1" style="stop-color:var(--gold);stop-opacity:0"/></linearGradient>
 <linearGradient id="gBar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--gold-ink)"/><stop offset="1" style="stop-color:var(--gold);stop-opacity:.5"/></linearGradient>
 <linearGradient id="gGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F6EAC8"/><stop offset=".32" stop-color="#D3B678"/><stop offset=".64" stop-color="#9F7E42"/><stop offset="1" stop-color="#E4CC95"/></linearGradient>
 <radialGradient id="gTop" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="137"><stop offset=".24" stop-color="#96732F"/><stop offset=".64" stop-color="#D4B169"/><stop offset="1" stop-color="#F4E3B3"/></radialGradient>
@@ -270,7 +275,7 @@ h2 small{margin-left:7px;font-size:12.5px;font-weight:500;letter-spacing:0;color
 <div id="gate" class="gate" hidden></div>
 <main id="app" hidden>
 <section class="view" id="v-home">
-<header class="top"><h1>내 정보</h1><p id="h-date"></p></header>
+<header class="top"><h1>내 정보</h1></header>
 <div class="card noir">
 <svg class="guil" id="guil" viewBox="-100 -100 200 200" aria-hidden="true"></svg>
 <div class="c-top"><p class="mark"><svg viewBox="0 0 9 11"><path d="M4.5 0 9 5.5 4.5 11 0 5.5Z"/></svg><span class="foil" id="c-brand"></span></p><span class="ava" id="c-ava"></span></div>
@@ -315,6 +320,10 @@ const IC = {
   stats: "M5 20v-7M12 20V4M19 20v-11",
   rank: "M4 8.5l4.2 3.7L12 5.5l3.8 6.7L20 8.5 18.5 18h-13L4 8.5Z",
   roulette: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18ZM12 9.8a2.2 2.2 0 1 0 0 4.4 2.2 2.2 0 0 0 0-4.4ZM12 3v6.8M12 14.2V21M4.2 7.5l5.9 3.4M13.9 13.1l5.9 3.4M4.2 16.5l5.9-3.4M13.9 10.9l5.9-3.4",
+  attend: "M7.5 3.5v3M16.5 3.5v3M4.5 9h15M6 5h12a1.5 1.5 0 0 1 1.5 1.5v12A1.5 1.5 0 0 1 18 20H6a1.5 1.5 0 0 1-1.5-1.5v-12A1.5 1.5 0 0 1 6 5ZM9 14.2l2 2 4-4.2",
+  grant: "M12 4v10.5M7.8 10.3l4.2 4.2 4.2-4.2M4.5 16.5V18A1.5 1.5 0 0 0 6 19.5h12a1.5 1.5 0 0 0 1.5-1.5v-1.5",
+  revoke: "M12 14.5V4M7.8 8.2 12 4l4.2 4.2M4.5 16.5V18A1.5 1.5 0 0 0 6 19.5h12a1.5 1.5 0 0 0 1.5-1.5v-1.5",
+  admin: "M4.5 7.5h8M16.5 7.5h3M4.5 16.5h3M11.5 16.5h8M14.5 5.5v4M9.5 14.5v4",
   ticket: "M4 9V7.5A1.5 1.5 0 0 1 5.5 6h13A1.5 1.5 0 0 1 20 7.5V9a3 3 0 0 0 0 6v1.5a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 16.5V15a3 3 0 0 0 0-6ZM14.5 9.5v1M14.5 13.5v1",
   point: "M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17ZM10 16.2V8h2.7a2.5 2.5 0 0 1 0 5H10",
   check: "M5.5 12.5l4.2 4.2 8.8-9.2",
@@ -325,7 +334,9 @@ const IC = {
 };
 const icon = (n) => `<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="${IC[n]}"/></svg>`;
 const empty = (ic, a, b = "") => `<div class="empty">${ic ? icon(ic) : ""}<p>${a}</p><span>${b}</span></div>`;
-const cell = ([l, v, un, s]) => `<div class="cell"><p class="lab">${l}</p><p class="val"><b>${v}</b><i>${un}</i></p><p class="sub">${s}</p></div>`;
+const cell = ([l, v, un, s, go]) => `<${go ? `button type="button" data-go="${go}"` : "div"} class="cell"><span class="lab">${l}</span><span class="val"><b>${v}</b><i>${un}</i></span><span class="sub${go === "roulette" ? " go" : ""}">${s}</span></${go ? "button" : "div"}>`;
+const big = (v) => (v >= 1e6 ? kfmt(v) : fmt(v));
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const bar = (i, x, y0, h, w, s = -1) => { const r = Math.min(3, w / 2, h); return `<path style="--d:${i}" data-i="${i}" d="M${f1(x - w / 2)} ${y0}V${f1(y0 + s * (h - r))}q0 ${s * r} ${r} ${s * r}h${f1(w - 2 * r)}q${r} 0 ${r} ${-s * r}V${y0}Z"/>`; };
 const SK = (...h) => h.map((x) => `<div class="sk" style="height:${x}px"></div>`).join("");
 
@@ -339,9 +350,11 @@ function theme() {
 }
 
 async function api(path, method = "GET") {
+  const c = new AbortController(), t = setTimeout(() => c.abort(), 12000);
   let res;
-  try { res = await fetch(path, { method, headers: { "X-Init-Data": tg?.initData || "" } }); }
+  try { res = await fetch(path, { method, headers: { "X-Init-Data": tg?.initData || "" }, signal: c.signal }); }
   catch { throw Object.assign(new Error("네트워크 상태를 확인한 뒤 다시 시도해 주세요."), { status: 0 }); }
+  finally { clearTimeout(t); }
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw Object.assign(new Error(typeof body.detail === "string" ? body.detail : "요청을 처리하지 못했습니다."), { status: res.status });
   return body;
@@ -353,6 +366,18 @@ function fit(el) {
   el.style.fontSize = "";
   const w = el.clientWidth, s = el.scrollWidth;
   if (s > w) el.style.fontSize = Math.floor(parseFloat(getComputedStyle(el).fontSize) * w / s * 10) / 10 - .3 + "px";
+}
+
+function even(els) {
+  if (!els.length || !els[0].offsetParent) return;
+  els.forEach(fit);
+  const m = Math.min(...els.map((e) => parseFloat(getComputedStyle(e).fontSize)));
+  els.forEach((e) => (e.style.fontSize = m + "px"));
+}
+
+function refit() {
+  $$(".bal,.ro-v,#h-att .val").forEach((el) => el.offsetParent && fit(el));
+  even($$("#h-strip .val")); even($$("#s-body .kpi .val"));
 }
 
 function count(el, to, from = 0, ms = 900) {
@@ -374,15 +399,6 @@ function nice(m) {
   return [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10].find((c) => c * p >= q) * p * 4;
 }
 
-function smooth(p) {
-  const n = p.length, d = [], m = [];
-  for (let i = 0; i < n - 1; i++) d[i] = (p[i + 1][1] - p[i][1]) / (p[i + 1][0] - p[i][0]);
-  for (let i = 0; i < n; i++) m[i] = !i ? d[0] : i === n - 1 ? d[n - 2] : d[i - 1] * d[i] <= 0 ? 0 : 2 * d[i - 1] * d[i] / (d[i - 1] + d[i]);
-  let s = `M${p[0]}`;
-  for (let i = 0; i < n - 1; i++) { const h = (p[i + 1][0] - p[i][0]) / 3; s += `C${p[i][0] + h} ${p[i][1] + m[i] * h} ${p[i + 1][0] - h} ${p[i + 1][1] - m[i + 1] * h} ${p[i + 1]}`; }
-  return s;
-}
-
 function scrub(el, n, pw, pick) {
   const svg = $("svg", el);
   let t;
@@ -401,34 +417,27 @@ function chart(el, o) {
   const X = (i) => f1((i + .5) * sw), Y = (x) => f1(y0 - (top ? x / top * ph : 0));
   let s = `<line class="gl b" x2="${pw}" y1="${y0}" y2="${y0}"/>`;
   if (max) {
-    const ya = Y(v.reduce((a, b) => a + b, 0) / n), pk = v.indexOf(max);
-    [1, .5].forEach((k) => {
-      const y = Y(top * k);
-      s += `<line class="gl" x2="${pw}" y1="${y}" y2="${y}"/>` + (Math.abs(y - ya) < 14 ? "" : `<text class="tk" x="${W}" y="${y + 3.5}" text-anchor="end">${kfmt(top * k)}</text>`);
-    });
-    s += `<line class="avl" x2="${pw}" y1="${ya}" y2="${ya}"/><text class="tk" x="${W}" y="${ya + 3.5}" text-anchor="end">평균</text>`;
-    if (o.area) {
-      const p = v.map((x, i) => [X(i), Y(x)]), line = n > 1 ? smooth(p) : `M0 ${p[0][1]}H${pw}`;
-      s += `<path class="ar" d="${line}V${y0}H${n > 1 ? p[0][0] : 0}Z"/><path class="ln" d="${line}"/><circle class="dot end" cx="${p[n - 1][0]}" cy="${p[n - 1][1]}" r="3.5"/>`;
-    } else s += `<g class="bars">${v.map((x, i) => (x ? bar(i, X(i), y0, Math.max(2, x / top * ph), Math.min(o.bw, Math.max(2, sw - 3))) : "")).join("")}</g>`;
+    const pk = v.indexOf(max);
+    [1, .5].forEach((k) => { const y = Y(top * k); s += `<line class="gl" x2="${pw}" y1="${y}" y2="${y}"/><text class="tk" x="${W}" y="${y + 3.5}" text-anchor="end">${kfmt(top * k)}</text>`; });
+    if (o.avg !== false) { const ya = Y(v.reduce((a, b) => a + b, 0) / n); s += `<line class="avl" x2="${pw}" y1="${ya}" y2="${ya}"/>`; }
+    s += `<g class="bars">${v.map((x, i) => (x ? bar(i, X(i), y0, Math.max(2, x / top * ph), Math.min(o.bw, Math.max(2, sw - 3))) : "")).join("")}</g>`;
     s += `<text class="pk" x="${clamp(X(pk), 16, pw - 16)}" y="${Y(max) - 7}" text-anchor="middle">${o.peak(pk)}</text>`;
   } else s += `<text class="nil" x="${pw / 2}" y="${pt + ph / 2 + 4}" text-anchor="middle">기록 없음</text>`;
   o.ticks.forEach(([i, t]) => { s += `<text class="tk" x="${!i ? 0 : i === n - 1 ? pw : X(i)}" y="${H - 3}" text-anchor="${!i ? "start" : i === n - 1 ? "end" : "middle"}">${t}</text>`; });
-  el.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${o.name}">${s}<line class="xh" y1="${pt - 4}" y2="${y0}"/>${o.area ? `<circle class="dot xd" r="3.5"/>` : ""}</svg><div class="tip"><span></span><b></b></div>`;
+  el.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="${o.name}">${s}<line class="xh" y1="${pt - 4}" y2="${y0}"/></svg><div class="tip"><span></span><b></b></div>`;
   if (!n) return;
-  const xh = $(".xh", el), xd = $(".xd", el), tip = $(".tip", el), bars = $$(".bars path", el);
+  const xh = $(".xh", el), tip = $(".tip", el), bars = $$(".bars path", el);
   scrub(el, n, pw, (i) => {
     bars.forEach((b) => b.classList.toggle("on", +b.dataset.i === i));
     xh.setAttribute("x1", X(i)); xh.setAttribute("x2", X(i));
-    if (xd) { xd.setAttribute("cx", X(i)); xd.setAttribute("cy", Y(v[i])); }
     [tip.firstChild.textContent, tip.lastChild.textContent] = o.tip(i);
     tip.style.transform = `translateX(${clamp(X(i) - tip.offsetWidth / 2, 0, W - tip.offsetWidth)}px)`;
   });
 }
 
 function flow(el, d) {
-  const n = d.length, W = el.clientWidth, H = 72, mid = 28, sw = W / (n || 1), bw = Math.min(5, Math.max(2, sw - 3)), X = (i) => f1((i + .5) * sw);
-  const u = 22 / Math.max(1, ...d.map((x) => Math.max(x.joins, x.leaves)));
+  const n = d.length, W = el.clientWidth, H = 78, mid = 31, sw = W / (n || 1), bw = Math.min(5, Math.max(2, sw - 3)), X = (i) => f1((i + .5) * sw);
+  const u = 25 / Math.max(1, ...d.map((x) => Math.max(x.joins, x.leaves)));
   const bars = (k, s) => d.map((x, i) => (x[k] ? bar(i, X(i), mid + s * 1.5, x[k] * u, bw, s) : "")).join("");
   el.innerHTML = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="입장 · 퇴장"><line class="gl b" x2="${W}" y1="${mid}" y2="${mid}"/><g class="bars">${bars("joins", -1)}</g><g class="bars dn">${bars("leaves", 1)}</g>`
     + (n ? `<text class="tk" y="${H - 3}">${md(d[0].day)}</text><text class="tk" x="${W}" y="${H - 3}" text-anchor="end">오늘</text>` : "")
@@ -446,7 +455,6 @@ function flow(el, d) {
 
 function home() {
   const u = me.user, t = me.today, P = PERIOD[me.period] || "", on = hasWheel(), dd = +t.slice(8);
-  $("#h-date").textContent = `${+t.slice(5, 7)}월 ${dd}일 ${wd(t)}요일`;
   $("#c-brand").textContent = me.app_name;
   $("#c-name").textContent = u.name;
   $("#c-user").textContent = u.username ? "@" + u.username : "";
@@ -454,9 +462,9 @@ function home() {
   const pts = $("#c-pts");
   pts.textContent = fmt(u.points); fit(pts.parentNode); count(pts, u.points, seen); seen = u.points;
 
-  const cells = [[`${P} 순위`, u.rank ? fmt(u.rank) : "–", u.rank ? "위" : "", u.rank_total ? `${fmt(u.rank_total)}명 중` : "기록 없음"],
-    ["누적 채팅", fmt(u.messages), "회", me.period === "all" ? "전체 기간" : `${P} ${fmt(u.rank_count)}회`]];
-  if (on) cells.unshift(["이용권", fmt(u.tickets), "장", "룰렛 1회 1장"]);
+  const cells = [[`${P} 순위`, u.rank ? big(u.rank) : "–", u.rank ? "위" : "", u.rank_total ? `${fmt(u.rank_total)}명 중` : "기록 없음", "rank"],
+    ["누적 채팅", big(u.messages), "회", me.period === "all" ? "전체 기간" : `${P} ${big(u.rank_count)}회`]];
+  if (on) cells.unshift(["이용권", big(u.tickets), "장", "룰렛 열기 ›", "roulette"]);
   $("#h-strip").innerHTML = cells.map(cell).join("");
 
   const y = +t.slice(0, 4), m = +t.slice(5, 7), dim = new Date(Date.UTC(y, m, 0)).getUTCDate(), first = new Date(Date.UTC(y, m - 1, 1)).getUTCDay();
@@ -471,16 +479,17 @@ function home() {
     + `<div class="ruler">${ticks}</div>` + (u.attended_today ? "" : `<p class="hint">그룹방에 <b>/출석</b>을 입력하면 출석됩니다.</p>`);
 
   const a = me.activity, av = a.map((x) => x.count), n = a.length;
-  $("#h-act").innerHTML = `<div class="ph"><h2>내 채팅<small>${n}일</small></h2><span>일평균 <b>${fmt(Math.round(av.reduce((p, c) => p + c, 0) / (n || 1)))}</b>회</span></div><div class="chart"></div>`;
+  $("#h-act").innerHTML = `<div class="ph"><h2>내 채팅<small>${n}일</small></h2><span><i class="key"></i>일평균 <b>${fmt(Math.round(av.reduce((p, c) => p + c, 0) / (n || 1)))}</b>회</span></div><div class="chart"></div>`;
   chart($("#h-act .chart"), { name: "내 채팅", v: av, h: 128, bw: 8, peak: (i) => fmt(av[i]), ticks: n ? [[0, md(a[0].day)], [n >> 1, md(a[n >> 1].day)], [n - 1, "오늘"]] : [], tip: (i) => [`${md(a[i].day)} (${wd(a[i].day)})`, `${fmt(av[i])}회`] });
 
   let day;
   const logs = me.logs.filter((l) => on || l.kind === "points");
   $("#h-logs").innerHTML = `<div class="ph"><h2>최근 내역</h2></div>` + (logs.length ? logs.map((l) => {
     const d = l.ts.slice(0, 10), p = l.kind === "points", un = p ? " P" : "장";
-    return (d === day ? "" : `<p class="grp">${dayName(day = d)}</p>`) + `<div class="row"><span class="ico">${icon(p ? "point" : "ticket")}</span><div class="rm"><b>${esc(REASON[l.reason] || l.reason)}</b><span>${esc(l.ts.slice(11, 16))} · ${p ? "잔액" : "잔여"} ${fmt(l.balance)}${un}</span></div><em class="${l.delta < 0 ? "neg" : "pos"}">${l.delta < 0 ? "−" : "+"}${fmt(Math.abs(l.delta))}${un}</em></div>`;
+    return (d === day ? "" : `<p class="grp">${dayName(day = d)}</p>`) + `<div class="row"><span class="ico">${icon(IC[l.reason] ? l.reason : p ? "point" : "ticket")}</span><div class="rm"><b>${esc(REASON[l.reason] || l.reason)}</b><span>${esc(l.ts.slice(11, 16))}${p ? "" : " · 이용권"}</span></div><div class="ra"><em class="${l.delta < 0 ? "neg" : "pos"}">${l.delta < 0 ? "−" : "+"}${fmt(Math.abs(l.delta))}${un}</em><span>${p ? "잔액" : "잔여"} ${fmt(l.balance)}${un}</span></div></div>`;
   }).join("") : empty("list", "내역 없음", on ? "포인트와 이용권 변동이 여기에 기록됩니다." : "포인트 변동이 여기에 기록됩니다."));
-  $$("#v-home .val").forEach(fit);
+  $$("#h-att .val").forEach(fit);
+  even($$("#h-strip .val"));
 }
 
 async function drawStats() {
@@ -494,18 +503,19 @@ async function drawStats() {
   const k = [["오늘 채팅", t.messages_today, "회", `7일 ${fmt(t.messages_week)}회`], ["오늘 활동", t.active_today, "명", `7일 ${fmt(t.active_week)}명`],
     ["회원", t.members, "명", `누적 채팅 ${fmt(t.messages_all)}회`], ["전체 포인트", t.points, " P", hasWheel() ? `이용권 ${fmt(t.tickets)}장` : "회원 보유 합계"]];
   const j = sum("joins"), l = sum("leaves"), hp = h.indexOf(Math.max(...h));
+  const avgk = (k, un) => `<span><i class="key"></i>일평균 <b>${avg(k)}</b>${un}</span>`;
   const head = (a, b, c, x = "") => `<div class="panel"><div class="ph"><h2>${a}<small>${b}</small></h2>${c}</div>${x}<div class="chart"></div></div>`;
   el.innerHTML = `<div class="panel strip kpi">${k.map(([a, v, un, s]) => cell([a, `<span data-n="${+v || 0}">${fmt(v)}</span>`, un, s])).join("")}</div>`
-    + head("일별 채팅", `${n}일`, `<span>일평균 <b>${avg("messages")}</b>회</span>`) + head("일별 활동 인원", `${n}일`, `<span>일평균 <b>${avg("users")}</b>명</span>`)
+    + head("일별 채팅", `${n}일`, avgk("messages", "회")) + head("일별 활동 인원", `${n}일`, avgk("users", "명"))
     + head("시간대별 채팅", `${n}일 합계`, Math.max(...h) ? `<span>최다 <b>${hp}시</b></span>` : "")
     + head("입장 · 퇴장", `${n}일`, `<span>순증 <b>${j - l > 0 ? "+" : j - l < 0 ? "−" : ""}${fmt(Math.abs(j - l))}</b>명</span>`, `<p class="lg"><span><i></i>입장<b>${fmt(j)}</b></span><span><i></i>퇴장<b>${fmt(l)}</b></span></p>`);
   const c = $$(".chart", el), wk = Array.from({ length: Math.ceil(n / 7) }, (_, i) => n - 1 - i * 7).map((i) => [i, i === n - 1 ? "오늘" : md(d[i].day)]);
-  const daily = (name, key, un, area) => ({ name, v: d.map((x) => x[key]), h: 140, bw: 5, area, peak: (i) => fmt(d[i][key]), ticks: wk, tip: (i) => [`${md(d[i].day)} (${wd(d[i].day)})`, fmt(d[i][key]) + un] });
+  const daily = (name, key, un) => ({ name, v: d.map((x) => x[key]), h: 140, bw: 5, peak: (i) => fmt(d[i][key]), ticks: wk, tip: (i) => [`${md(d[i].day)} (${wd(d[i].day)})`, fmt(d[i][key]) + un] });
   chart(c[0], daily("일별 채팅", "messages", "회"));
-  chart(c[1], daily("일별 활동 인원", "users", "명", 1));
-  chart(c[2], { name: "시간대별 채팅", v: h, h: 132, bw: 6, peak: (i) => `${i}시`, ticks: [0, 6, 12, 18, 23].map((i) => [i, `${i}시`]), tip: (i) => [`${i}시`, `${fmt(h[i])}회`] });
+  chart(c[1], daily("일별 활동 인원", "users", "명"));
+  chart(c[2], { name: "시간대별 채팅", v: h, h: 132, bw: 6, avg: false, peak: (i) => `${i}시`, ticks: [0, 6, 12, 18, 23].map((i) => [i, `${i}시`]), tip: (i) => [`${i}시`, `${fmt(h[i])}회`] });
   flow(c[3], d);
-  $$(".val", el).forEach(fit);
+  even($$(".kpi .val", el));
   if (!once.stats) $$("[data-n]", el).forEach((b) => count(b, +b.dataset.n));
   once.stats = 1;
   enter(el);
@@ -524,10 +534,10 @@ async function drawRank(p = period) {
     if (period !== p || tab !== "rank") return;
   }
   const rows = r.rows || [], out = rows.length > 0 && !rows.some((x) => x.id === uid);
-  $("#r-total").textContent = r.total ? `참여 ${fmt(r.total)}명` : "";
+  $("#r-total").textContent = r.total ? `채팅 횟수 · ${fmt(r.total)}명` : "채팅 횟수";
   const pod = (i) => { const x = rows[i]; return `<div class="pod p${i + 1}${x?.id === uid ? " me" : ""}">${i ? "" : icon("rank")}<span class="av">${x ? esc(mono(x.name)) : ""}</span><b>${x ? esc(x.name) : "–"}</b><span>${x ? fmt(x.count) + "회" : "&nbsp;"}</span><div class="pl">${i + 1}</div></div>`; };
-  el.innerHTML = `<div class="podium">${pod(1)}${pod(0)}${pod(2)}</div>` + (rows.length > 3 ? `<div class="panel rows">${rows.slice(3).map((x, i) => rrow(i + 4, x.name, fmt(x.count), x.id === uid)).join("")}</div>`
-    : rows.length ? "" : `<div class="panel rows">${empty("", "집계된 채팅 없음", "이 기간에 채팅한 회원이 없습니다.")}</div>`);
+  el.innerHTML = !rows.length ? `<div class="panel">${empty("rank", "집계된 채팅 없음", "이 기간에 채팅한 회원이 없습니다.")}</div>`
+    : `<div class="podium">${pod(1)}${pod(0)}${pod(2)}</div>` + (rows.length > 3 ? `<div class="panel rows">${rows.slice(3).map((x, i) => rrow(i + 4, x.name, fmt(x.count), x.id === uid)).join("")}</div>` : "");
   pin.hidden = !out; $("#v-rank").classList.toggle("pinned", out);
   pin.innerHTML = out ? rrow(r.me?.rank ? fmt(r.me.rank) : "–", me.user.name, r.me?.rank ? fmt(r.me.count) : "기록 없음", 1) : "";
   enter(el);
@@ -541,15 +551,15 @@ function buildWheel() {
   const pt = (d, r) => { const a = d * Math.PI / 180; return `${+(Math.sin(a) * r).toFixed(2)} ${+(-Math.cos(a) * r).toFixed(2)}`; };
   const em = (t) => [...t].reduce((a, c) => a + (c >= "0" && c <= "9" ? .6 : c === "," || c === "." ? .26 : 1), 0);
   const fs = [28, 28, 28, 26, 22, 20, 18.5, 17.5, 16.5, 15.5, 14.5, 14, 13.5][n] || 13, across = 2 * (solid ? 98 : 80) * Math.sin(Math.PI / n) * .74;
-  const radial = Math.max(...s.map((v) => em(prize(v)))) * fs > across * 1.4, rl = radial ? 90 : solid ? 98 : 80, room = radial ? 84 : across;
+  const radial = n >= 9 || Math.max(...s.map((v) => em(prize(v)))) * fs > across * 1.4, rl = radial ? 90 : solid ? 98 : 80, room = radial ? 84 : across;
   wedge = (i) => `M0 0L${pt(i * th, 137)}A137 137 0 0 1 ${pt((i + 1) * th, 137)}Z`;
   let seg = "", sep = "", peg = "", lab = "";
   s.forEach((v, i) => {
     const hi = v === top, text = prize(v);
-    seg += `<path class="${hi ? (solid ? "w-top" : "w-tint") : "w" + (n % 2 && i === n - 1 ? 2 : i % 2)}" d="${wedge(i)}"/>`;
+    seg += `<path data-i="${i}" class="${hi ? (solid ? "w-top" : "w-tint") : "w" + (n % 2 && i === n - 1 ? 2 : i % 2)}" d="${wedge(i)}"/>`;
     sep += `<path d="M${pt(i * th, 34)}L${pt(i * th, 137)}"/>`;
     peg += `<circle r="2.3" transform="rotate(${i * th}) translate(0 -129)"/>`;
-    lab += `<text transform="rotate(${(i + .5) * th}) translate(0 ${-rl})${radial ? " rotate(-90)" : ""}" dy=".36em" font-size="${f1(Math.min(fs, room / em(text)))}"${hi ? ` class="${solid ? "t-top" : "t-tint"}"` : v ? "" : ` class="t-nil"`}>${text}</text>`;
+    lab += `<text data-i="${i}" transform="rotate(${(i + .5) * th}) translate(0 ${-rl})${radial ? " rotate(-90)" : ""}" dy=".36em" font-size="${f1(Math.min(fs, room / em(text)))}"${hi ? ` class="${solid ? "t-top" : "t-tint"}"` : v ? "" : ` class="t-nil"`}>${text}</text>`;
   });
   const box = `viewBox="-160 -160 320 320" aria-hidden="true"`;
   rot = 360 - (s.indexOf(Math.max(...s)) + .5) * th;
@@ -557,12 +567,12 @@ function buildWheel() {
     + `<svg ${box}><circle r="144.2" fill="none" stroke="#090807" stroke-width="12.6"/><circle r="144.2" fill="none" stroke="#8F7240" stroke-width="4" stroke-dasharray=".9 14.2" opacity=".8"/><circle r="150.5" fill="none" stroke="#000" stroke-opacity=".6"/></svg>`
     + `<svg ${box} id="disc" style="transform:rotate(${rot}deg)"><circle r="138" fill="#0A0908"/>${seg}<g class="w-sep">${sep}</g><circle class="w-ring" r="137"/><g class="w-peg">${peg}</g><g class="w-lab" text-anchor="middle">${lab}</g><path class="hit" id="hit"/><circle r="35" fill="#0C0B09"/><circle class="w-ring" r="35"/></svg>`
     + `<svg ${box}><circle r="137.5" fill="url(#gSheen)"/><circle r="29" cy="3" fill="#000" opacity=".5"/><circle r="26" fill="url(#gHub)" stroke="url(#gGold)" stroke-width="2.5"/><path d="M0-9 6.6 0 0 9-6.6 0Z" fill="url(#gGold)"/>`
-    + `<path d="M0-123 10-157H-10Z" opacity=".45"/><path d="M0-126-9.5-158H0Z" fill="#F6EAC8"/><path d="M0-126 9.5-158H0Z" fill="#B28E50"/><path d="M0-126 9.5-158H-9.5Z" fill="none" stroke="#17120A" stroke-width=".75" stroke-linejoin="round"/></svg>`;
+    + `<g id="needle"><path d="M0-123 10-157H-10Z" opacity=".45"/><path d="M0-126-9.5-158H0Z" fill="#F6EAC8"/><path d="M0-126 9.5-158H0Z" fill="#B28E50"/><path d="M0-126 9.5-158H-9.5Z" fill="none" stroke="#17120A" stroke-width=".75" stroke-linejoin="round"/></g></svg>`;
 }
 
 function readout(s, pts) {
   const u = me.user, el = $("#ro"), have = `보유 ${fmt(u.points)} P · 이용권 ${fmt(u.tickets)}장`, won = `<b class="foil">+<span>0</span></b><i>P</i>`, left = `<b>${fmt(u.tickets)}</b><i>장</i>`;
-  const [a, b, c] = { idle: ["이용권", left, u.tickets ? "1회에 1장 사용" : "이용권은 관리자가 지급합니다"], spin: ["이용권", left, "1회에 1장 사용"], lose: ["결과", "<b>꽝</b>", have], win: ["당첨", won, have], top: ["최고 당첨", won, have] }[s];
+  const [a, b, c] = { idle: ["이용권", left, u.tickets ? `보유 ${fmt(u.points)} P` : "이용권은 관리자가 지급합니다"], spin: ["이용권", left, `보유 ${fmt(u.points)} P`], lose: ["결과", "<b>꽝</b>", have], win: ["당첨", won, have], top: ["최고 당첨", won, have] }[s];
   const fresh = el.dataset.s !== s;
   el.dataset.s = s;
   el.innerHTML = `<p class="ro-l">${a}</p><p class="ro-v">${b}</p><p class="ro-s">${c}</p>`;
@@ -585,44 +595,72 @@ function winners() {
   }).join("") : empty("roulette", "당첨 기록 없음"));
 }
 
-function turn(i) {
-  const disc = $("#disc"), th = 360 / me.roulette.slots.length, A = (x) => ({ transform: `rotate(${x}deg)` });
-  const to = (still ? 720 : 2520) - (i + .5 + (Math.random() - .5) * .56) * th;
-  const a = disc.animate(still ? [A(rot), A(to)] : [{ ...A(rot), easing: "cubic-bezier(.45,0,.55,1)" }, { ...A(rot - 16), offset: .075, easing: "cubic-bezier(.15,.6,.25,1)" }, A(to)], { duration: still ? 600 : 5400, fill: "forwards" });
-  rot = to % 360;
-  return a.finished.then(() => { disc.style.transform = `rotate(${rot}deg)`; a.cancel(); });
+function motor() {
+  const disc = $("#disc"), nd = $("#needle"), th = 360 / me.roulette.slots.length;
+  let v = 0, last = performance.now(), plan, done;
+  const end = new Promise((r) => (done = r));
+  const paint = () => {
+    const p = (((rot % th) + th) % th) / th;
+    disc.style.transform = `rotate(${rot}deg)`;
+    nd.setAttribute("transform", `rotate(${f1(-15 * Math.min(1, v / 220) * Math.exp(-p * 6))} 0 -157)`);
+  };
+  const frame = (t) => {
+    const dt = Math.min(.05, (t - last) / 1e3);
+    last = t;
+    if (plan) {
+      const q = 1 - Math.min(1, (t - plan.t) / plan.T);
+      rot = plan.a + plan.S * (1 - q * q * q); v = 3000 * plan.S * q * q / plan.T;
+      if (!q) { rot %= 360; v = 0; paint(); return done(); }
+    } else { v = Math.min(620, v + 1400 * dt); rot += v * dt; }
+    paint();
+    requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
+  const brake = (S) => { plan = { a: rot, S, T: 3000 * S / Math.max(v, 1), t: performance.now() }; return end; };
+  return { land: (to) => brake((((to - rot) % 360) + 360) % 360 + 720), stop: () => brake(Math.max(v, 1) * .3) };
 }
 
 function celebrate(big) {
   if (still) return;
-  const fx = $("#fx"), b = $("#wheel").getBoundingClientRect(), R = b.width / 2, cx = b.left + R, cy = b.top + R;
+  const fx = $("#fx"), b = $("#wheel").getBoundingClientRect(), R = b.width / 2, cx = b.left + R, cy = b.top + R, view = $("#v-roulette");
+  view.classList.add("party"); clearTimeout(view._p); view._p = setTimeout(() => view.classList.remove("party"), 3800);
   const add = (tag, css, frames, opt) => { const e = D.createElement(tag); e.style.cssText = css; fx.append(e); e.animate(frames, { fill: "both", ...opt }).onfinish = () => e.remove(); };
   for (let k = 0; k < (big ? 3 : 1); k++) add("b", `left:${b.left}px;top:${b.top}px;width:${b.width}px;height:${b.height}px`, [{ transform: "scale(.95)", opacity: .9 }, { transform: "scale(1.13)", opacity: 0 }], { duration: 1200, delay: k * 340, easing: "cubic-bezier(.2,.7,.2,1)" });
   for (let k = 0; big && k < 48; k++) {
-    const a = Math.random() * 6.283, c = Math.cos(a), s = Math.sin(a), d = R * (.12 + Math.random() * .5), z = .5 + Math.random(), r = Math.random() * 540 - 270;
-    add("i", `left:${cx + c * R * .97}px;top:${cy + s * R * .97}px`, [{ transform: "scale(0)", opacity: 0, easing: "cubic-bezier(.1,.7,.3,1)" }, { transform: `translate(${c * d}px,${s * d}px) scale(${z}) rotate(${r}deg)`, opacity: 1, offset: .5, easing: "cubic-bezier(.5,0,.9,.6)" }, { transform: `translate(${c * d * 1.15}px,${s * d + R * .55}px) scale(${z * .7}) rotate(${r * 1.7}deg)`, opacity: 0 }], { duration: 2400 + Math.random() * 1000, delay: Math.random() * 150 });
+    const a = Math.random() * 3.84 - 3.5, c = Math.cos(a), s = Math.sin(a), d = R * (.1 + Math.random() * .34), z = .5 + Math.random(), r = Math.random() * 540 - 270;
+    add("i", `left:${cx + c * R * .97}px;top:${cy + s * R * .97}px`, [{ transform: "scale(0)", opacity: 0, easing: "cubic-bezier(.1,.7,.3,1)" }, { transform: `translate(${c * d}px,${s * d}px) scale(${z}) rotate(${r}deg)`, opacity: 1, offset: .5, easing: "cubic-bezier(.5,0,.9,.6)" }, { transform: `translate(${c * d * 1.15}px,${s * d + R * .4}px) scale(${z * .7}) rotate(${r * 1.7}deg)`, opacity: 0 }], { duration: 2400 + Math.random() * 1000, delay: Math.random() * 150 });
   }
 }
 
+function rest() {
+  $("#hit").classList.remove("on");
+  $("#disc").classList.remove("done");
+  $$("#disc .win").forEach((e) => e.classList.remove("win"));
+}
+
 async function spin() {
-  const u = me.user, hit = $("#hit");
+  const u = me.user, hit = $("#hit"), disc = $("#disc");
   if (busy || !u.tickets) return;
   busy = true; R.dataset.spinning = "1";
-  cta(); readout("spin"); hit.classList.remove("on"); haptic("impactOccurred", "medium");
+  cta(); readout("spin"); rest(); haptic("impactOccurred", "medium");
+  const m = still ? null : motor();
   let r;
-  try { r = await api("/api/spin", "POST"); }
+  try { [r] = await Promise.all([api("/api/spin", "POST"), wait(still ? 0 : 700)]); }
   catch (e) {
+    if (m) await m.stop();
     busy = false; delete R.dataset.spinning;
     if (e.status === 409) u.tickets = 0;
     cta(); readout("idle"); $(".ro-s").textContent = e.message; haptic("notificationOccurred", "error");
     return;
   }
   u.tickets = r.tickets; readout("spin");
-  await turn(r.index);
+  const to = 360 - (r.index + .5 + (Math.random() - .5) * .56) * 360 / me.roulette.slots.length;
+  if (m) await m.land(to); else { rot = ((to % 360) + 360) % 360; disc.style.transform = `rotate(${rot}deg)`; }
   const kind = !r.points ? "lose" : r.points >= best() ? "top" : "win";
   u.points = r.balance;
   if (r.points) me.roulette.recent = [{ name: u.name, points: r.points, ts: new Date(Date.now() + 324e5).toISOString().slice(0, 19).replace("T", " ") }, ...me.roulette.recent].slice(0, 10);
   hit.setAttribute("d", wedge(r.index)); hit.classList.add("on");
+  $$(`#disc [data-i="${r.index}"]`).forEach((e) => e.classList.add("win")); disc.classList.add("done");
   busy = false;
   readout(kind, r.points); winners(); cta();
   haptic("notificationOccurred", r.points ? "success" : "warning");
@@ -652,7 +690,7 @@ function gate(e) {
   R.dataset.ready = "1";
 }
 
-const draw = { home, stats: drawStats, rank: drawRank, roulette: () => { if (!busy) { readout("idle"); $("#hit").classList.remove("on"); } winners(); cta(); } };
+const draw = { home, stats: drawStats, rank: drawRank, roulette: () => { if (!busy) { readout("idle"); rest(); } winners(); cta(); } };
 
 function show(t) {
   if (t === tab) return scrollTo({ top: 0, behavior: still ? "auto" : "smooth" });
@@ -686,9 +724,10 @@ async function init() {
 }
 
 $("#tabs").onclick = (e) => { const b = e.target.closest("button"); if (!b) return; if (b.dataset.tab !== tab) haptic("selectionChanged"); show(b.dataset.tab); };
+$("#h-strip").onclick = (e) => { const b = e.target.closest("[data-go]"); if (b && $(`#tabs [data-tab="${b.dataset.go}"]`)) { haptic("selectionChanged"); show(b.dataset.go); } };
 $("#r-seg").onclick = (e) => { const b = e.target.closest("button"); if (b && b.dataset.period !== period) { haptic("selectionChanged"); drawRank(b.dataset.period); } };
 addEventListener("resize", () => { if (innerWidth === width) return; width = innerWidth; if (tab && tab !== "roulette") draw[tab](); });
-D.fonts?.ready.then(() => $$(".bal,.val,.ro-v").forEach((el) => el.offsetParent && fit(el)));
+D.fonts?.ready.then(refit);
 tg?.onEvent?.("themeChanged", theme);
 tg?.ready?.(); tg?.expand?.();
 theme();
